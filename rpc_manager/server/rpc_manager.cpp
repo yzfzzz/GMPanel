@@ -14,6 +14,7 @@ void ServerManagerImpl::SetMonitorInfo(
     ::google::protobuf::RpcController* controller,
     const ::monitor::proto::MonitorInfo* request,
     ::google::protobuf::Empty* response, ::google::protobuf::Closure* done) {
+    std::lock_guard<std::mutex> lock(set_mutex_);
     LOG(INFO) << "RPC Call: ServerManagerImpl::SetMonitorInfo";
     monitor_infos_.Clear();
     monitor_infos_ = *request;
@@ -26,6 +27,7 @@ void ServerManagerImpl::GetMonitorInfo(
     const ::monitor::proto::QueryMessage* request,
     ::monitor::proto::QueryResults* response,
     ::google::protobuf::Closure* done) {
+    std::lock_guard<std::mutex> lock(get_mutex_);
     // LOG(INFO) << "RPC Call: ServerManagerImpl::GetMonitorInfo";
     *response = queryDataInfo(request);
     done->Run();

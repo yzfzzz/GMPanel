@@ -43,6 +43,8 @@ class ServerManagerImpl : public monitor::proto::MonitorManager {
 
    private:
     std::mutex create_mutex_;
+    std::mutex set_mutex_;
+    std::mutex get_mutex_;
     monitor::proto::MonitorInfo monitor_infos_;
     ConnectionPool* pool = ConnectionPool::getConnectPool();
 
