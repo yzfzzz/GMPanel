@@ -1,12 +1,16 @@
-#-- coding:GBK --
+#-- coding:UTF-8 --
 #!/usr/bin/python3
 import json
 import os
 import time
 from pynvml import *
 
-pipe_path = "/home/work/bin/utils/py_cpp_pipe.fifo"
+pipe_path = ""
 nvmlInit()
+# 打开JSON文件，使用'with'语句可以确保文件正确关闭，避免资源泄露
+with open('./utils/monitor_config.json', 'r') as file:
+    monitor_config = json.load(file)
+    pipe_path = "./utils/"+monitor_config["account_num"]+"_"+monitor_config["machine_name"]+".fifo"
 
 if not os.path.exists(pipe_path):
     os.mkfifo(pipe_path)
