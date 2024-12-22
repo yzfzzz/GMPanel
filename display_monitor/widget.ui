@@ -455,7 +455,20 @@ background-image:url(:/backimg.png);}</string>
      </widget>
     </item>
     <item>
-     <widget class="QComboBox" name="machine_comboBox"/>
+     <widget class="QComboBox" name="machine_comboBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::DefaultContextMenu</enum>
+      </property>
+      <property name="maxVisibleItems">
+       <number>2</number>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -503,12 +516,12 @@ background-image:url(:/backimg.png);}</string>
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>30</x>
      <y>70</y>
-     <width>171</width>
+     <width>188</width>
      <height>201</height>
     </rect>
    </property>
@@ -699,19 +712,13 @@ NVIDIA MX350</string>
     </item>
    </layout>
   </widget>
+  <zorder>layoutWidget</zorder>
   <zorder>horizontalFrame_4</zorder>
-  <zorder>gpu_name</zorder>
-  <zorder>gpu_num</zorder>
   <zorder>horizontalLayoutWidget</zorder>
   <zorder>horizontalLayoutWidget_2</zorder>
   <zorder>horizontalLayoutWidget_3</zorder>
-  <zorder>introduction</zorder>
   <zorder>horizontalLayoutWidget_4</zorder>
-  <zorder>label_3</zorder>
-  <zorder>label_4</zorder>
   <zorder>horizontalLayoutWidget_5</zorder>
-  <zorder>label_commandLinkButton_logo</zorder>
-  <zorder>commandLinkButton</zorder>
  </widget>
  <customwidgets>
   <customwidget>

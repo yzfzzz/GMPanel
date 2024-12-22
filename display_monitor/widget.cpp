@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QUrl>
 #include <iostream>
+#include <QDebug>
 #include <string>
 #include "ui_widget.h"
 #include "widget.h"

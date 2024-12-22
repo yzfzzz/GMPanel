@@ -11,11 +11,11 @@ Login::Login(QWidget *parent) : QWidget(parent), ui(new Ui::Login) {
         QTextStream in(&file);
         in.setCodec("UTF-8");
         QString htmlContent = in.readAll();
-        qDebug() << htmlContent;
         file.close();
         // 将读取的HTML内容设置到QTextBrowser中
         ui->textBrowser->setHtml(htmlContent);
     }
+    ui->lineE_pwd->setEchoMode(QLineEdit::Password);
     std::string server_address = "localhost:50051";
     rpc_client_ptr = new monitor::RpcClient(server_address);
 }
@@ -66,9 +66,11 @@ void Login::on_btn_login_clicked() {
             std::string response_str = response.response_str();
             std::vector<std::string> machine_name_array;
             for (int i = 0; i < response.machine_name_array_size(); i++) {
-                std::string machine_name = *response.mutable_machine_name_array(i);
+                std::string machine_name =
+                    *response.mutable_machine_name_array(i);
                 machine_name_array.push_back(machine_name);
-                std::cout << "login machine name: " << machine_name << std::endl;
+                std::cout << "login machine name: " << machine_name
+                          << std::endl;
             }
             std::cout << response_str << std::endl;
             QString notice;

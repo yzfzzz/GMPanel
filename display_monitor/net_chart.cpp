@@ -65,5 +65,14 @@ void NetChart::drawChart(QList<QPointF> data_send, QList<QPointF> data_recv) {
         axis_x_->setRange(
             QDateTime::fromMSecsSinceEpoch(data_send.begin()->x()),
             QDateTime::fromMSecsSinceEpoch(data_send.rbegin()->x()));
+        std::cout << "NetChart::drawChart: start "
+                  << QDateTime::fromMSecsSinceEpoch(data_send.begin()->x())
+                         .toString()
+                         .toStdString()
+                  << " end "
+                  << QDateTime::fromMSecsSinceEpoch(data_send.rbegin()->x())
+                         .toString()
+                         .toStdString()
+                  << std::endl;
     }
 }
