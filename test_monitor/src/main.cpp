@@ -1,8 +1,8 @@
+#include <fstream>
 #include <memory>
 #include <string>
 #include <thread>
 #include <vector>
-#include <fstream>
 #include "client/rpc_client.h"
 #include "cpu_load_monitor.h"
 #include "cpu_softirq_monitor.h"
@@ -23,10 +23,12 @@ int main(int argc, char** argv) {
     config_file >> config_json_data;
     config_file.close();
 
-    std::string fifo_path = config_json_data["fifo_path"];
     std::string server_address = config_json_data["server_address"];
     std::string account_num = config_json_data["account_num"];
     std::string machine_name = config_json_data["machine_name"];
+    std::string fifo_path = "./utils/"+account_num + "_" + machine_name + ".fifo";
+    std::cout << "FIFO PATH:" << fifo_path << std::endl;
+
     MprpcApplication::Init(argc, argv);
     google::InitGoogleLogging(argv[0]);
 
