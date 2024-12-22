@@ -10,6 +10,9 @@ Start::Start(int argc, char** argv, QWidget* parent)
         ui->login_w, &Login::loginJump, this,
         [=](std::string account_num,
             std::vector<std::string> machine_name_array) {
+            if (machine_name_array.size() == 0) {
+                machine_name_array.push_back("No machine!!!");
+            }
             for (int i = 0; i < machine_name_array.size(); i++) {
                 std::cout << "Run Start func: " << machine_name_array[i]
                           << std::endl;
@@ -29,6 +32,7 @@ Start::Start(int argc, char** argv, QWidget* parent)
                 ui->stackedWidget->addWidget(
                     monitor_map[machine_name_array[i]]);
             }
+
             ui->stackedWidget->setCurrentWidget(
                 monitor_map[machine_name_array[0]]);
         });
