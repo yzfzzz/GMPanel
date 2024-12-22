@@ -1,3 +1,4 @@
+#include <QThread>
 #include "work_thread.h"
 
 WorkThread::WorkThread(QObject* parent) : QObject(parent) { max_size_ = 30; }
@@ -12,6 +13,8 @@ void WorkThread::run(int argc, char** argv, std::string account_num,
         updateData(query_data.query_result_array_);
         std::cout << "queryData init succeed!" << std::endl;
     }
+    QThread::msleep(100);
+
     while (true) {
         int n = 1;
         query_data.query_result_array_.clear();
@@ -80,8 +83,8 @@ void WorkThread::updateData(std::vector<monitor::MidInfo>& midinfo_array) {
 
     for (int i = 0; i < midinfo_array.size(); i++) {
         // GPU使用情况, 网络收发
-        // std::cout << "[" << i << "]  " << midinfo_array[i].timehms << ":  "
-        //           << midinfo_array[i].net_rcv_rate << std::endl;
+        std::cout << "[" << i << "]  " << midinfo_array[i].timehms << ":  "
+                  << midinfo_array[i].net_rcv_rate << std::endl;
         dataReceived(midinfo_array[i].gpu_avg_util,
                      midinfo_array[i].net_send_rate,
                      midinfo_array[i].net_rcv_rate, midinfo_array[i].timehms);
@@ -121,8 +124,8 @@ void WorkThread::sendData() {
 
 void WorkThread::dataReceived(int value_gpu, int value_send, int value_recv,
                               std::string cur_time) {
-    std::cout << "running func: WorkThread::dataReceived" << std::endl;
-    std::cout << cur_time << std::endl;
+    std::cout << "running func: WorkThread::dataReceived " << cur_time
+              << std::endl;
     QString time_str = QString::fromStdString(cur_time);
 
     QDateTime time = QDateTime::fromString(time_str, "hh:mm:ss");
@@ -131,6 +134,10 @@ void WorkThread::dataReceived(int value_gpu, int value_send, int value_recv,
     QPointF recv_point(time.toMSecsSinceEpoch(), value_recv);
     QPointF gpu_point(time.toMSecsSinceEpoch(), value_gpu);
 
+    if(!net_list_send_.isEmpty() && net_list_send_.last().x()==time.toMSecsSinceEpoch())
+    {
+        return;
+    }
     net_list_send_ << send_point;
     net_list_recv_ << recv_point;
     gpu_list_ << gpu_point;
