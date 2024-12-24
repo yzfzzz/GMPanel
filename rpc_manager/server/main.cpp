@@ -2,8 +2,11 @@
 #include <string>
 #include <vector>
 #include "rpc_manager.h"
+#include "log.h"
 
 int main(int argv, char** argc) {
+    std::string log_path = "./logs";
+    monitor::SetupLogging(log_path);
     // 调用框架的初始化操作
     MprpcApplication::Init(argv, argc);
 

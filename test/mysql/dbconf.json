@@ -2,10 +2,11 @@
     "ip":"host.docker.internal",
     "port":3306,
     "userName":"debian-sys-maint",
-    "password":"uUakoE1X8Ei6TqLJ",
+    "password":"SQ0CTalwPPoAhCnh",
     "dbName":"data",
     "minSize":100,
     "maxSize":1024,
     "maxIdleTime":5000,
     "timeout":1000
 }
+

@@ -47,23 +47,42 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "any": "cpp",
+        "bit": "cpp",
+        "codecvt": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "condition_variable": "cpp",
+        "cstring": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "map": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "iomanip": "cpp",
+        "mutex": "cpp",
+        "numbers": "cpp",
+        "ranges": "cpp",
+        "semaphore": "cpp",
+        "stop_token": "cpp",
+        "valarray": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled",
+    "editor.formatOnSave": true,
 
-
-            // clang-format 扩展的配置，覆盖用户的 `settings.json`
-        // "clang-format.style" : "file:./.clang-format", //从指定配置文件读取格式化风格。
-        "clang-format.style" : "file",
-        // 依次从当前目录、工作目录、path变量，加载默认风格配置文件(.clang-format)。
-        // 如果找不到则使用fallbackStyle, 没有fallbackStyle则默认LLVM,C++。
-        "clang-format.assumeFilename": "../.clang-format", //使用工作区独立配置文件
-        // "clang-format.assumeFilename": "/home/user/.clang-format", //绝对路径，用于全局统一配置
-        "clang-format.executable": "/usr/bin/clang-format",
-        "clang-format.fallbackStyle": "Google",
-        "editor.defaultFormatter": "xaver.clang-format",
-        "[cpp]": {
-            "editor.defaultFormatter": "xaver.clang-format"
-        },
+    // clang-format 扩展的配置，覆盖用户的 `settings.json`
+    // "clang-format.style" : "file:./.clang-format", //从指定配置文件读取格式化风格。
+    //"clang-format.style" : "./.clang-format",
+    // 依次从当前目录、工作目录、path变量，加载默认风格配置文件(.clang-format)。
+    // 如果找不到则使用fallbackStyle, 没有fallbackStyle则默认LLVM,C++。
+    "clang-format.assumeFilename": "/home/yzf/home/linux-monitor-main/.clang-format", //使用工作区独立配置文件
+    // "clang-format.assumeFilename": "/home/user/.clang-format", //绝对路径，用于全局统一配置
+    "clang-format.executable": "/usr/bin/clang-format",
+    "clang-format.fallbackStyle": "Google",
+    "editor.defaultFormatter": "xaver.clang-format",
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
 
 }

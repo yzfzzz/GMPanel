@@ -14,13 +14,13 @@
 #include "monitor_info.pb.h"
 #include "monitor_info.pb.h"
 #include "log.h"
+#include "get_time.h"
 
 int main(int argc, char** argv) {
     char* fifo_path = "py_cpp_pipe.fifo";
     MprpcApplication::Init(argc, argv);
     google::InitGoogleLogging(argv[0]);
-    std::string log_path = "./logs";
-    monitor::SetupLogging(log_path);
+
     std::vector<std::shared_ptr<monitor::MonitorInter>> runners_;
     runners_.emplace_back(new monitor::CpuSoftIrqMonitor());
     runners_.emplace_back(new monitor::CpuLoadMonitor());
@@ -31,18 +31,24 @@ int main(int argc, char** argv) {
 
 
     std::string server_address = "localhost:50051";
-    LOG(INFO) << "server_address: " << server_address;
-    LOG(WARNING) << "This is a warning message.";
-    LOG(ERROR) << "This is an error message.";
 
     monitor::RpcClient rpc_client_(server_address);
     char* name = getenv("USER");
+    std::string accountnum = "12345678";
     LOG(INFO) << "name " << name;
     std::unique_ptr<std::thread> thread_ = nullptr;
     thread_ = std::make_unique<std::thread>([&]() {
         while (true) {
             monitor::proto::MonitorInfo monitor_info;
+            monitor::get_curTime curTime;
+            
             monitor_info.set_name(std::string(name));
+            monitor_info.set_accountnum(accountnum);
+
+            auto curtime_msg = monitor_info.mutable_time();
+            curtime_msg->set_timeymd(curTime.get_year_mon_day());
+            curtime_msg->set_timehms(curTime.get_hour_min_sec());
+
             for (auto& runner : runners_) {
                 runner->UpdateOnce(&monitor_info);
             }

@@ -1,8 +1,8 @@
-# ÕÒµ½È«¾Ö»·¾³ÖÐµÄgrpcÒÀÀµ°ü
+# ï¿½Òµï¿½È«ï¿½Ö»ï¿½ï¿½ï¿½ï¿½Ðµï¿½grpcï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 #[[
-Ö¸¶¨Ê¹ÓÃ config Ä£Ê½À´²éÕÒ protobuf ¿â¡£ÔÚ config Ä£Ê½ÏÂ£¬CMake »áËÑË÷ÃûÎª <package_name>-config.cmake 
-»ò config.cmake µÄÎÄ¼þ£¨¶ÔÓÚ protobuf ¿âÀ´Ëµ£¬¾ÍÊÇ protobuf-config.cmake ÎÄ¼þ£©£¬ÕâÐ©ÎÄ¼þÍ¨³£ÓÉ¿âµÄ°²×°
-¹ý³ÌÉú³É£¬°üº¬ÁË¿âµÄÍ·ÎÄ¼þÂ·¾¶¡¢¿âÎÄ¼þÂ·¾¶µÈÐÅÏ¢
+Ö¸ï¿½ï¿½Ê¹ï¿½ï¿½ config Ä£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ protobuf ï¿½â¡£ï¿½ï¿½ config Ä£Ê½ï¿½Â£ï¿½CMake ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª <package_name>-config.cmake 
+ï¿½ï¿½ config.cmake ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ protobuf ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ protobuf-config.cmake ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð©ï¿½Ä¼ï¿½Í¨ï¿½ï¿½ï¿½É¿ï¿½Ä°ï¿½×°
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë¿ï¿½ï¿½Í·ï¿½Ä¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 ]]
 
 # ÎªÊ²Ã´ set(CMAKE_CXX_STANDARD 17) ?
@@ -20,21 +20,23 @@ set(PROTO_FILES
     mem_info.proto
     net_info.proto
     gpu_info.proto
+    time.proto
+    query.proto
 )
 
-# ÖÆ×÷¾²Ì¬¿â
+# ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¬ï¿½ï¿½
 add_library(monitor_proto ${PROTO_FILES})
-# Á´½Ó¾²Ì¬¿â
+# ï¿½ï¿½ï¿½Ó¾ï¿½Ì¬ï¿½ï¿½
 target_link_libraries(monitor_proto
     PUBLIC
         protobuf::libprotobuf
         # gRPC::grpc
         # gRPC::grpc++
 )
-# Ö¸¶¨¿âµÄÍ·ÎÄ¼þÂ·¾¶
+# Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½Ä¼ï¿½Â·ï¿½ï¿½
 target_include_directories(monitor_proto PUBLIC
 ${PROTOBUF_INCLUDE_DIRS}
-# Õâ¸ö¸Ð¾õ¿ÉÒÔ²»¼Ó
+# ï¿½ï¿½ï¿½ï¿½Ð¾ï¿½ï¿½ï¿½ï¿½Ô²ï¿½ï¿½ï¿½
 ${CMAKE_CURRENT_BINARY_DIR}
 )
 

@@ -1,38 +1,20 @@
-
 #include <QApplication>
+#include <iostream>
+#include <memory>
 #include <thread>
-#include "mprpcapplication.h"
+#include <vector>
+#include "query_data.h"
+#include "widget.h"
 #include "client/rpc_client.h"
-#include "monitor_widget.h"
+#include "mprpcapplication.h"
 
-int main(int argc, char** argv) {
-    QApplication app(argc, argv);
-    MprpcApplication::Init(argc, argv);
-
-    std::string server_address = "localhost:50051";
-
-    monitor::MonitorWidget moitor_widget;
-    monitor::RpcClient rpc_client(server_address);
-    monitor::proto::MonitorInfo monitor_info;
-
-    // get board name
-    rpc_client.GetMonitorInfo(&monitor_info);
-    std::string name = monitor_info.name();
-
-    QWidget* widget = moitor_widget.ShowAllMonitorWidget(name);
-    widget->show();
-
-    std::unique_ptr<std::thread> thread_;
-    thread_ = std::make_unique<std::thread>([&]() {
-        while (true) {
-            monitor_info.Clear();
-            rpc_client.GetMonitorInfo(&monitor_info);
-
-            moitor_widget.UpdateData(monitor_info);
-            std::this_thread::sleep_for(std::chrono::seconds(2));
-        }
-    });
-    thread_->detach();
-
-    return app.exec();
+int main(int argc, char *argv[]) {
+    QApplication a(argc, argv);
+    qRegisterMetaType<QVector<QString>>("QVector<QString>");
+    qRegisterMetaType<QVector<int>>("QVector<int>");
+    qRegisterMetaType<QList<QPointF>>("QList<QPointF>");
+    qRegisterMetaType<char**>("char**");
+    Widget w(argc, argv);
+    w.show();
+    return a.exec();
 }

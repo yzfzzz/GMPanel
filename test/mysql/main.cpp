@@ -11,10 +11,10 @@
 void no_pool(int begin, int end) {
     for (int i = begin; i < end; i++) {
         MysqlConn conn;
-        conn.connect("debian-sys-maint", "uUakoE1X8Ei6TqLJ", "data",
+        conn.connect("debian-sys-maint", "SQ0CTalwPPoAhCnh", "data",
                      "host.docker.internal");
         char sql[1024] = {0};
-        sprintf(sql, "insert into score values(%d,'Mike',30,80,90)", i);
+        sprintf(sql, "insert into score values(%d,'Mike')", i);
         conn.update(sql);
     }
 }
@@ -23,14 +23,14 @@ void use_pool(ConnectionPool* pool, int begin, int end) {
     for (int i = begin; i < end; i++) {
         std::shared_ptr<MysqlConn> conn_ptr = pool->getConnection();
         char sql[1024] = {0};
-        sprintf(sql, "insert into score values(%d,'Mike',30,80,90)", i);
+        sprintf(sql, "insert into score values(%d,'Mike')", i);
         conn_ptr->update(sql);
     }
 }
 
 // 单线程: 使用/不使用连接池
 void test1() {
-#if 0
+#if 1
     std::chrono::steady_clock::time_point start =
         std::chrono::steady_clock::now();
     no_pool(0, 5000);
@@ -110,6 +110,6 @@ void test2() {
 }
 
 int main() {
-    test2();
+    test1();
     return 0;
 }

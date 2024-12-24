@@ -5,15 +5,14 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <thread>
 #include "gpu_monitor.h"
 #include "json.hpp"
 #include "monitor_info.pb.h"
-#include <string>
-using json = nlohmann::json;
 
 monitor::GpuMonitor::GpuMonitor(char* pipeName) {
-    // ÅÐ¶Ï¶Á¹ÜµÀÊÇ·ñ´æÔÚ£¬²»´æÔÚÔò´´½¨
+    // ï¿½Ð¶Ï¶ï¿½ï¿½Üµï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ò´´½ï¿½
     int ret = access(pipeName, F_OK);
     if (ret == -1) {
         printf("pipe isn't exit, create...\n");
@@ -23,7 +22,7 @@ monitor::GpuMonitor::GpuMonitor(char* pipeName) {
             exit(-1);
         }
     }
-    // ´ò¿ªÓÐÃû¹ÜµÀ½øÐÐ¶ÁÈ¡
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Üµï¿½ï¿½ï¿½ï¿½Ð¶ï¿½È¡
     this->fd = open(pipeName, O_RDONLY);
     if (fd == -1) {
         std::cerr << "Error opening pipe." << std::endl;
@@ -31,7 +30,8 @@ monitor::GpuMonitor::GpuMonitor(char* pipeName) {
     }
 }
 
-void monitor::GpuMonitor::UpdateOnce(monitor::proto::MonitorInfo* monitor_info) {
+void monitor::GpuMonitor::UpdateOnce(
+    monitor::proto::MonitorInfo* monitor_info) {
     char raw_buffer[1024];
     int bytesRead = 0;
     int max_attempts = 3;
@@ -41,28 +41,27 @@ void monitor::GpuMonitor::UpdateOnce(monitor::proto::MonitorInfo* monitor_info) 
         if (bytesRead > 0) {
             break;
         } else if (bytesRead == 0) {
-            std::cout << "Accidentally disconnected!" << std::endl;
             attempt_count += 1;
-            // !ÕâÀï´úÂëºÃÏñÓÐµãÐ¡ÎÊÌâ
-            std::this_thread::sleep_for(std::chrono::seconds(2 * attempt_count));
+            // !ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Ð¡ï¿½ï¿½ï¿½ï¿½
+            std::this_thread::sleep_for(
+                std::chrono::seconds(2 * attempt_count));
         }
     }
     if (attempt_count == max_attempts) {
         std::cout << "Error reading from pipe." << std::endl;
+
         return;
     }
 
     std::string str(raw_buffer);
     char buffer[1024];
     int first_index = str.find('[');
-    int last_index = str.find(']');
-    std::copy(str.begin()+first_index, str.begin()+last_index+1, buffer);
-    buffer[last_index-first_index+1] = '\0';
+    int last_index = str.find(']', first_index);
+    std::copy(str.begin() + first_index, str.begin() + last_index + 1, buffer);
+    buffer[last_index - first_index + 1] = '\0';
 
-
-    LOG(INFO) << "Json Buffer: " <<buffer;
-    // ½âÎö JSON Êý¾Ý
-    json data_list = json::parse(buffer);
+    // ï¿½ï¿½ï¿½ï¿½ JSON ï¿½ï¿½ï¿½ï¿½
+    nlohmann::json data_list = nlohmann::json::parse(buffer);
     for (auto data : data_list) {
         gpu_id = data["ID"];
         gpu_name = data["DeviceName"];
@@ -75,7 +74,7 @@ void monitor::GpuMonitor::UpdateOnce(monitor::proto::MonitorInfo* monitor_info) 
         fan_speed = data["FanSpeed"];
         power_stat = data["PowerStstus"];
 
-        // TODO:²éÒ»ÏÂÊÇadd»¹ÊÇmutable
+        // TODO:ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½addï¿½ï¿½ï¿½ï¿½mutable
         auto gpu_info_msg = monitor_info->add_gpu_info();
         gpu_info_msg->set_id(gpu_id);
         gpu_info_msg->set_gpu_name(gpu_name);

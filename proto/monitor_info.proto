@@ -8,8 +8,10 @@ import "cpu_stat.proto";
 import "cpu_softirq.proto";
 import "cpu_load.proto";
 import "gpu_info.proto";
+import "time.proto";
+import "query.proto";
 
-// ¶¨ÒåÏÂÃæÑ¡Ïî, ±íÊ¾Éú³Éservice·þÎñÀàºÍrpc·½·¨ÃèÊö, Ä¬ÈÏ²»Éú³É
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½, ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½serviceï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rpcï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, Ä¬ï¿½Ï²ï¿½ï¿½ï¿½ï¿½ï¿½
 option cc_generic_services = true;
 // message MemInfo {
 //   int64 total = 1;
@@ -89,7 +91,9 @@ message MonitorInfo {
 
     repeated GpuInfo gpu_info = 10;
 
-    string ip_addr = 12;
+    string accountnum = 12;
+
+    Time time = 13;
 
     ResultCode result = 9;
 }
@@ -97,5 +101,5 @@ message MonitorInfo {
 service MonitorManager {
     rpc SetMonitorInfo(MonitorInfo) returns(google.protobuf.Empty) {}
 
-    rpc GetMonitorInfo(google.protobuf.Empty) returns(MonitorInfo) {}
+    rpc GetMonitorInfo(QueryMessage) returns(QueryResults) {}
 }

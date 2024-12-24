@@ -9,6 +9,8 @@ set(SOURCES
    utils/read_file.cpp
 )
 
+find_package(Boost REQUIRED COMPONENTS system chrono date_time)
+
 link_directories(${PROJECT_SOURCE_DIR}/build/proto 
                  ${PROJECT_SOURCE_DIR}/build/rpc_manager/client
                  ${PROJECT_SOURCE_DIR}/mprpc/lib)
@@ -31,4 +33,5 @@ target_link_libraries(monitor
     boost_chrono
     mprpc
     glog
+    boost_date_time
 )

@@ -1,4 +1,3 @@
-#include "mprpcchannel.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -6,10 +5,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "mprpcapplication.h"
+#include "mprpcchannel.h"
 #include "rpcheader.pb.h"
 #include "zookeeperutil.h"
 /*
-Êý¾Ý¸ñÊ½: header_size + service_name method_name args_size + args
+ï¿½ï¿½ï¿½Ý¸ï¿½Ê½: header_size + service_name method_name args_size + args
 */
 void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
                               google::protobuf::RpcController* controller,
@@ -20,10 +20,10 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     std::string service_name = sd->name();
     std::string method_name = method->name();
 
-    // »ñÈ¡²ÎÊýµÄÐòÁÐ»¯×Ö·û´®³¤¶È args_size
+    // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ args_size
     std::string args_str;
     int args_size = 0;
-    // ÐòÁÐ»¯
+    // ï¿½ï¿½ï¿½Ð»ï¿½
     if (request->SerializeToString(&args_str)) {
         args_size = args_str.size();
     } else {
@@ -32,7 +32,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         return;
     }
 
-    // ¶¨ÒårpcµÄÇëÇóheader
+    // ï¿½ï¿½ï¿½ï¿½rpcï¿½ï¿½ï¿½ï¿½ï¿½ï¿½header
     mprpc::RpcHeader rpcHeader;
     rpcHeader.set_service_name(service_name);
     rpcHeader.set_method_name(method_name);
@@ -47,15 +47,15 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         controller->SetFailed("seriallize response error!");
         return;
     }
-    // ×éÖ¯´ý·¢ËÍµÄrpcÇëÇó×Ö·û´®
-    // ???header_size¶þ½øÖÆ´æ´¢
+    // ï¿½ï¿½Ö¯ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½rpcï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
+    // ???header_sizeï¿½ï¿½ï¿½ï¿½ï¿½Æ´æ´¢
     std::string send_rpc_str;
-    // ±íÊ¾ RPC Í·²¿´óÐ¡µÄ uint32_t ÀàÐÍ±äÁ¿ header_size ÒÔ¶þ½øÖÆÐÎÊ½´æ´¢µ½Ò»¸ö×Ö·û´®ÖÐ
+    // ï¿½ï¿½Ê¾ RPC Í·ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ uint32_t ï¿½ï¿½ï¿½Í±ï¿½ï¿½ï¿½ header_size ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½æ´¢ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½
     send_rpc_str.insert(0, std::string((char*)&header_size, 4));
     send_rpc_str += rpc_header_str;
     send_rpc_str += args_str;
 
-    // ´òÓ¡µ÷ÊÔÐÅÏ¢
+    // ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
     // std::cout << "=========================" << std::endl;
     // std::cout << "header_size: " << header_size << std::endl;
     // std::cout << "rpc_header_str: " << rpc_header_str << std::endl;
@@ -63,7 +63,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     // std::cout << "method_name: " << method_name << std::endl;
     // std::cout << "args_str: " << args_str << std::endl;
 
-    // Ê¹ÓÃtcp±à³Ì
+    // Ê¹ï¿½ï¿½tcpï¿½ï¿½ï¿½
     int clientfd = socket(AF_INET, SOCK_STREAM, 0);
     if (clientfd == -1) {
         std::cout << "error:" << errno << std::endl;
@@ -74,8 +74,9 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         return;
     }
 
-    // std::string ip = MprpcApplication::GetInstance().GetConfig().Load("rpcserverip");
-    // uint16_t port =
+    // std::string ip =
+    // MprpcApplication::GetInstance().GetConfig().Load("rpcserverip"); uint16_t
+    // port =
     // atoi(MprpcApplication::GetInstance().GetConfig().Load("rpcserverip").c_str());
 
     ZkClient zkCli;
@@ -94,15 +95,17 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         return;
     }
     std::string ip = host_data.substr(0, idx);
-    uint16_t port = atoi(host_data.substr(idx + 1, host_data.size() - idx).c_str());
+    uint16_t port =
+        atoi(host_data.substr(idx + 1, host_data.size() - idx).c_str());
 
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port);
     server_addr.sin_addr.s_addr = inet_addr(ip.c_str());
 
-    // Á¬½Órpc·þÎñ¶Ë¿Ú
-    if (connect(clientfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+    // ï¿½ï¿½ï¿½ï¿½rpcï¿½ï¿½ï¿½ï¿½Ë¿ï¿½
+    if (connect(clientfd, (struct sockaddr*)&server_addr,
+                sizeof(server_addr)) == -1) {
         std::cout << "connect error! error:" << errno << std::endl;
         char errtxt[512] = {0};
         sprintf(errtxt, "connect socket error! errno: %d", errno);
@@ -111,7 +114,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         return;
     }
 
-    // ·¢ËÍrpcÇëÇó
+    // ï¿½ï¿½ï¿½ï¿½rpcï¿½ï¿½ï¿½ï¿½
     if (send(clientfd, send_rpc_str.c_str(), send_rpc_str.size(), 0) == -1) {
         std::cout << "send error! errno:" << errno << std::endl;
         char errtxt[512] = {0};
@@ -121,11 +124,11 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         return;
     }
 
-    // ?²»ÐèÒª×èÈûµÈ´ýÂð
-    // ½ÓÊÕrpcÇëÇóµÄÏìÓ¦Öµ
-    char recv_buf[1024] = {};
+    // ?ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½È´ï¿½ï¿½ï¿½
+    // ï¿½ï¿½ï¿½ï¿½rpcï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Öµ
+    char recv_buf[4096] = {};
     int recv_size = 0;
-    if ((recv_size = recv(clientfd, recv_buf, 1024, 0)) == -1) {
+    if ((recv_size = recv(clientfd, recv_buf, 4096, 0)) == -1) {
         std::cout << "recv error! errno:" << errno << std::endl;
         char errtxt[512] = {0};
         sprintf(errtxt, "recv socket error! errno: %d", errno);
@@ -134,7 +137,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         return;
     }
 
-    // ·´ÐòÁÐ»¯rpcµ÷ÓÃµÄÏìÓ¦Êý¾Ý
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½rpcï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½
     if (!response->ParseFromArray(recv_buf, recv_size)) {
         std::cout << "parse error! response str: " << recv_buf << std::endl;
         char errtxt[512] = {0};

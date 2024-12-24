@@ -7,4 +7,9 @@ cd /tmp
 curl https://bootstrap.pypa.io/pip/3.6/get-pip.py -o get-pip.py
 python get-pip.py
 pip install nvidia-ml-py3
-apt-get install libmysqlclient-dev
+apt-get install libmysqlclient-dev -y
+DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+export TZ=Asia/Shanghai
+cp -r /home/work/docker/build/install/fonts/* /usr/share/fonts/
+apt-get -y install fontconfig xfonts-utils
+fc-cache -f -v
