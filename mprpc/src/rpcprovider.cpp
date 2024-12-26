@@ -134,6 +134,7 @@ void RpcProvider::OnMessage(const muduo::net::TcpConnectionPtr& conn,
         // 数据头反序列化失败
         std::cout << "rpc_head_str: " << rpc_header_str << "parse error!"
                   << std::endl;
+        return;
     }
     // 获取rpc方法参数的字节流数据
     std::string args_str = recv_buf.substr(4 + header_size, args_size);
