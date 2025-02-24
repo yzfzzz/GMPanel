@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMPanel</title>
+    <link rel="stylesheet" href="http://at.alicdn.com/t/c/font_4835994_c6h6p88ea9j.css">
+    <link rel="stylesheet" href="https://at.alicdn.com/t/c/font_3957413_8w2n19m9w1.css">
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'AlibabaPuHuiTi-Regular', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            box-sizing: border-box;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            grid-column: span 2;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .progress-bar {
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 15px;
+            margin: 8px 0;
+        }
+
+        .progress-bar div {
+            background-color: #76c7c0;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .chart-container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            grid-column: span 3;
+            box-sizing: border-box;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .icon-relative {
+            font-size: 2rem;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chart-container {
+                grid-column: span 2;
+            }
+
+            .card {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                grid-column: span 1;
+            }
+
+            .card {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">GPU Monitor Panel</h1>
+    <div class="container">
+        <!-- 显卡信息 -->
+        <div class="card" id="basicInfoCard">
+            <h2>基本信息</h2>
+            <p><i class="iconfont icon-yonghu-yuan icon-relative" style="vertical-align: middle;"></i> 用户: <span id="userInfo">12345678</span></p>
+            <p><i class="iconfont icon-xianka icon-relative" style="vertical-align: middle;"></i> 显卡型号: <span id="gpuModel">NVIDIA GeForce MX350</span></p>
+            <p><i class="iconfont icon-shuzi icon-relative" style="vertical-align: middle;"></i> 显卡数量: <span id="gpuCount">1</span></p>
+        </div>
+
+        <!-- 运行内存 -->
+        <div class="card" id="cpuMemoryCard">
+            <h3>CPU 使用率</h3>
+            <p><span id="cpuUsage">37%</span></p>
+            <div class="progress-bar">
+                <div id="cpuUsageBar" style="width: 37%;"></div>
+            </div>
+
+            <h3>运行内存</h3>
+            <p><span id="memoryUsage">72%</span></p>
+            <div class="progress-bar">
+                <div id="memoryUsageBar" style="width: 72%;"></div>
+            </div>
+        </div>
+
+        <!-- 内存和显存使用率 -->
+        <div class="card" id="memoryGpuCard">
+            <h3>内存 使用率</h3>
+            <p><span id="ramUsage">37%</span></p>
+            <div class="progress-bar">
+                <div id="ramUsageBar" style="width: 37%;"></div>
+            </div>
+            <h3>显存 使用率</h3>
+            <p><span id="vramUsage">37%</span></p>
+            <div class="progress-bar">
+                <div id="vramUsageBar" style="width: 37%;"></div>
+            </div>
+        </div>
+
+        <!-- 流量收发情况 -->
+        <div class="chart-container">
+            <h2>流量收发情况</h2>
+            <canvas id="trafficChart"></canvas>
+        </div>
+
+        <!-- GPU 平均使用率 -->
+        <div class="chart-container">
+            <h2>GPU 平均使用率</h2>
+            <canvas id="gpuChart"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+
+        // 数据修改接口
+        const updateData = {
+            // 更新用户信息
+            setUserInfo: (user) => {
+                document.getElementById('userInfo').textContent = user;
+            },
+            // 更新显卡型号
+            setGpuModel: (model) => {
+                document.getElementById('gpuModel').textContent = model;
+            },
+            // 更新显卡数量
+            setGpuCount: (count) => {
+                document.getElementById('gpuCount').textContent = count;
+            },
+            // 更新 CPU 使用率
+            setCpuUsage: (usage) => {
+                document.getElementById('cpuUsage').textContent = `${usage}%`;
+                document.getElementById('cpuUsageBar').style.width = `${usage}%`;
+            },
+            // 更新内存使用率
+            setMemoryUsage: (usage) => {
+                document.getElementById('memoryUsage').textContent = `${usage}%`;
+                document.getElementById('memoryUsageBar').style.width = `${usage}%`;
+            },
+            // 更新 RAM 使用率
+            setRamUsage: (usage) => {
+                document.getElementById('ramUsage').textContent = `${usage}%`;
+                document.getElementById('ramUsageBar').style.width = `${usage}%`;
+            },
+            // 更新显存使用率
+            setVramUsage: (usage) => {
+                document.getElementById('vramUsage').textContent = `${usage}%`;
+                document.getElementById('vramUsageBar').style.width = `${usage}%`;
+            },
+            setGpuChart: (usage) => {
+                gpuChart.data.datasets[0].data = usage;
+                gpuChart.update();
+            },
+
+            setNetUpLoad: (usage) => {
+                trafficChart.data.datasets[0].data = usage;
+                trafficChart.update();
+            },
+
+            setNetDownLoad: (usage) => {
+                trafficChart.data.datasets[1].data = usage;
+                trafficChart.update();
+            }
+        };
+
+        // 新增：定时获取服务器数据
+        const fetchServerData = () => {
+            fetch('/data') // 假设服务器接口是 /api/data
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // 将响应解析为 JSON
+                })
+                .then(data => {
+                    console.log('Server data:', data); // 打印解析后的数据
+                    // 在这里处理数据，例如更新页面内容
+                    if (data.userInfo) {
+                        updateData.setUserInfo(data.userInfo);
+                    }
+                    if (data.gpuModel) {
+                        updateData.setGpuModel(data.gpuModel);
+                    }
+                    if (data.cpuUsage) {
+                        updateData.setCpuUsage(data.cpuUsage);
+                    }
+                    if (data.memoryUsage) {
+                        updateData.setMemoryUsage(data.memoryUsage);
+                    }
+                    if (data.gpuUsage) {
+                        updateData.setGpuUsage(data.gpuUsage);
+                    }
+                    if (data.ramUsage) {
+                        updateData.setRamUsage(60);
+                    }
+                    if (data.vramUsage) {
+                        updateData.setVramUsage(45);
+                    }
+                    if(data.gpuChart)
+                    {
+                        updateData.setGpuChart(data.gpuChart);
+                    }
+                    if(data.netUpload)
+                    {
+                        updateData.setNetUpLoad(data.netUpload);
+                    }
+                    if(data.netDownload)
+                    {
+                        updateData.setNetDownLoad(data.netDownload);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching server data:', error);
+                });
+        };
+        
+        fetchServerData();
+
+        // GPU 使用率图表
+        const gpuCtx = document.getElementById('gpuChart').getContext('2d');
+        const gpuChart = new Chart(gpuCtx, {
+            type: 'line',
+            data: {
+                labels: ['10:40', '11:02', '11:25', '11:47', '12:10'],
+                datasets: [{
+                    label: 'GPU 使用率',
+                    data: [100.0, 75.0, 50.0, 25.0, 0.0],
+                    fill: true,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        // 流量收发情况图表
+        const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+        const trafficChart = new Chart(trafficCtx, {
+            type: 'line',
+            data: {
+                labels: ['10:40', '11:02', '11:25', '11:47', '12:10'],
+                datasets: [
+                    {
+                        label: '上传',
+                        data: [20, 40, 30, 50, 45],
+                        fill: true,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.1
+                    },
+                    {
+                        label: '下载',
+                        data: [30, 50, 40, 60, 55],
+                        fill: true,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        setInterval(fetchServerData, 5000);
+    </script>
+</body>
+</html>
