@@ -4,17 +4,22 @@
 #include <muduo/net/http/HttpRequest.h>
 #include <muduo/net/http/HttpResponse.h>
 #include <muduo/net/http/HttpServer.h>
-
 #include <fstream>
 #include <iostream>
 #include <regex>
 #include <sstream>
 #include <unordered_map>
+#include <vector>
+#include "client/rpc_client.h"
 #include "json.hpp"
-
+#include "mprpcapplication.h"
+#include "query_data.h"
 using namespace muduo;
 using namespace muduo::net;
 using json = nlohmann::json;
+
+int h_argv;
+char** h_argc;
 
 // 模拟用户数据库
 std::unordered_map<std::string, std::string> users = {{"admin", "password123"},
@@ -22,16 +27,16 @@ std::unordered_map<std::string, std::string> users = {{"admin", "password123"},
 
 void onRequest(const HttpRequest& req, HttpResponse* resp) {
     // 打印请求信息
-    LOG_INFO << "Method: " << req.methodString();
-    LOG_INFO << "Path: " << req.path();
-    LOG_INFO << "Version: " << req.getVersion();
+    LOG_INFO << "Method: " << req.methodString() << " Path: " << req.path()
+             << " Version: " << req.getVersion();
 
     std::string path = req.path();
     if (path == "/" || path == "/index.html" || path == "/home.html") {
         if (path == "/") {
             path = "/index.html";
         }
-        std::ifstream file("." + path, std::ios::in | std::ios::binary);
+        std::ifstream file("./resource" + path,
+                           std::ios::in | std::ios::binary);
         if (!file) {
             resp->setStatusCode(HttpResponse::k404NotFound);
             resp->setStatusMessage("Not Found");
@@ -45,22 +50,20 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
         resp->setStatusMessage("OK");
         resp->setContentType("text/html");
         resp->setBody(content.str());
-    } else if (req.path() == "/data") {
-        json j;
-        j["userInfo"] = "Alice";
-        j["gpuModel"] = "AMD 4090";
-        j["cpuUsage"] = 99;
-        j["memoryUsage"] = 80;
-        j["gpuChart"] = {10, 20, 50, 40, 80, 10};
-        j["netUpload"] = {39, 20, 50, 80, 90};
-        j["netDownload"] = {19, 90, 70, 10, 20};
-        std::string json_str = j.dump();
+    } else if (path == "/data") {
+        monitor::RpcClient rpc_client;
+        monitor::QueryData query_data;
+        std::string account_num = "000001";
+        std::string machine_name = "test";
+        if (query_data.queryDataInfo(account_num, machine_name, 5,
+                                     rpc_client)) {
+            resp->setStatusCode(HttpResponse::k200Ok);
+            resp->setStatusMessage("OK");
+            resp->setContentType("text/plain");
+            resp->setBody(query_data.toJsonStr());
+        }
 
-        resp->setStatusCode(HttpResponse::k200Ok);
-        resp->setStatusMessage("OK");
-        resp->setContentType("text/plain");
-        resp->setBody(json_str);
-    } else if (req.path() == "/login") {
+    } else if (path == "/login") {
         const std::string& request_query = req.query();
         // 定义正则表达式
         std::regex pattern(R"(\?username=([^&]+)&password=([^&]+))");
@@ -70,14 +73,9 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
         std::string username, password;
         // 进行匹配
         if (std::regex_match(request_query, matches, pattern)) {
-            std::cout << "Matched URL: " << matches[0] << std::endl;
             // 提取捕获组
             username = matches[1];
             password = matches[2];
-            std::cout << "Username: " << username << std::endl;
-            std::cout << "Password: " << password << std::endl;
-        } else {
-            std::cout << "Not matched: " << request_query << std::endl;
         }
 
         // 验证账号和密码
@@ -102,7 +100,10 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
     }
 }
 
-int main() {
+int main(int argv, char** argc) {
+    h_argc = argc;
+    h_argv = argv;
+    MprpcApplication::Init(h_argv, h_argc);
     EventLoop loop;
     HttpServer server(&loop, InetAddress("10.0.4.3", 80), "http_server");
     server.setHttpCallback(onRequest);

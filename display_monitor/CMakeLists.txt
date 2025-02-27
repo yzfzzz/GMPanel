@@ -24,7 +24,7 @@ set(SOURCES
     net_chart.cpp
     gpu_chart.cpp
     water_progress.cpp
-    query_data.cpp
+    ../tool/query_data.cpp
     work_thread.cpp
     widget.ui
     login.ui

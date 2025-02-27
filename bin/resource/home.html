@@ -147,7 +147,7 @@
 
         <!-- 运行内存 -->
         <div class="card" id="cpuMemoryCard">
-            <h3>CPU 使用率</h3>
+            <h3>CPU负载</h3>
             <p><span id="cpuUsage">37%</span></p>
             <div class="progress-bar">
                 <div id="cpuUsageBar" style="width: 37%;"></div>
@@ -162,12 +162,12 @@
 
         <!-- 内存和显存使用率 -->
         <div class="card" id="memoryGpuCard">
-            <h3>内存 使用率</h3>
-            <p><span id="ramUsage">37%</span></p>
+            <h3>显卡使用率</h3>
+            <p><span id="gpuUsage">37%</span></p>
             <div class="progress-bar">
-                <div id="ramUsageBar" style="width: 37%;"></div>
+                <div id="gpuUsageBar" style="width: 37%;"></div>
             </div>
-            <h3>显存 使用率</h3>
+            <h3>显存使用</h3>
             <p><span id="vramUsage">37%</span></p>
             <div class="progress-bar">
                 <div id="vramUsageBar" style="width: 37%;"></div>
@@ -215,9 +215,9 @@
                 document.getElementById('memoryUsageBar').style.width = `${usage}%`;
             },
             // 更新 RAM 使用率
-            setRamUsage: (usage) => {
-                document.getElementById('ramUsage').textContent = `${usage}%`;
-                document.getElementById('ramUsageBar').style.width = `${usage}%`;
+            setGpuUsage: (usage) => {
+                document.getElementById('gpuUsage').textContent = `${usage}%`;
+                document.getElementById('gpuUsageBar').style.width = `${usage}%`;
             },
             // 更新显存使用率
             setVramUsage: (usage) => {
@@ -237,6 +237,12 @@
             setNetDownLoad: (usage) => {
                 trafficChart.data.datasets[1].data = usage;
                 trafficChart.update();
+            },
+            setTime: (usage) => {
+                gpuChart.data.labels = usage;
+                trafficChart.data.labels = usage;
+                trafficChart.update();
+                gpuChart.update();
             }
         };
 
@@ -252,38 +258,39 @@
                 .then(data => {
                     console.log('Server data:', data); // 打印解析后的数据
                     // 在这里处理数据，例如更新页面内容
-                    if (data.userInfo) {
+                    if (data.userInfo!== undefined) {
                         updateData.setUserInfo(data.userInfo);
                     }
-                    if (data.gpuModel) {
+                    if (data.gpuModel!== undefined) {
                         updateData.setGpuModel(data.gpuModel);
                     }
-                    if (data.cpuUsage) {
+                    if (data.cpuUsage!== undefined) {
                         updateData.setCpuUsage(data.cpuUsage);
                     }
-                    if (data.memoryUsage) {
+                    if (data.memoryUsage!== undefined) {
                         updateData.setMemoryUsage(data.memoryUsage);
                     }
-                    if (data.gpuUsage) {
+                    if (data.gpuUsage !== undefined) {
                         updateData.setGpuUsage(data.gpuUsage);
                     }
-                    if (data.ramUsage) {
-                        updateData.setRamUsage(60);
+                    if (data.vramUsage!== undefined) {
+                        updateData.setVramUsage(data.vramUsage);
                     }
-                    if (data.vramUsage) {
-                        updateData.setVramUsage(45);
-                    }
-                    if(data.gpuChart)
+                    if(data.gpuChart!== undefined)
                     {
                         updateData.setGpuChart(data.gpuChart);
                     }
-                    if(data.netUpload)
+                    if(data.netUpload!== undefined)
                     {
                         updateData.setNetUpLoad(data.netUpload);
                     }
-                    if(data.netDownload)
+                    if(data.netDownload!== undefined)
                     {
                         updateData.setNetDownLoad(data.netDownload);
+                    }
+                    if(data.time !== undefined)
+                    {
+                        updateData.setTime(data.time);
                     }
                 })
                 .catch(error => {
