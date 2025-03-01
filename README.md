@@ -52,16 +52,14 @@
 | [tool](https://github.com/yzfzzz/linux-monitor/tree/main/tool) | 第三方/自己实现的功能库  |
 
 ## 😍效果
-**登录注册界面**
-![登录注册界面](./doc/img/登录注册界面.png)
-**qt客户端界面**
-![qt客户端界面](./doc/img/qt客户端界面.png)
-
-**网页端登录界面**
-![网页端登录界面](./doc/img/网页端登录界面.png)
-
-**网页端主界面**
-![网页端主界面](./doc/img/网页端主界面.png)
+登录注册界面<br>
+![登录注册界面](./doc/img/登录注册界面.png)<br>
+qt客户端界面<br>
+![qt客户端界面](./doc/img/qt客户端界面.png)<br>
+网页端登录界面<br>
+![网页端登录界面](./doc/img/网页端登录界面.png)<br>
+网页端主界面<br>
+![网页端主界面](./doc/img/网页端主界面.png)<br>
 
 ## 怎么用？
 
