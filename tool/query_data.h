@@ -40,7 +40,46 @@ class QueryData {
         data["netUpload"] = net_send_array;
         data["netDownload"] = net_recv_array;
         data["time"] = time_array;
+        data["userInfo"] = account_num;
         return data.dump();
     }
+    std::string account_num;
+    std::string machine_name;
 };
+
+class Login {
+   public:
+    bool login(std::string account_num, std::string pwd) {
+        monitor::RpcClient rpc_client;
+        monitor::proto::UserMessage request;
+        monitor::proto::UserResponseMessage response;
+        request.set_account_num(account_num);
+        request.set_pwd(pwd);
+        rpc_client.LoginRegister(request, response);
+        response_str = response.response_str();
+
+        for (int i = 0; i < response.machine_name_array_size(); i++) {
+            std::string machine_name = *response.mutable_machine_name_array(i);
+            machine_name_array.push_back(machine_name);
+            std::cout << "login machine name: " << machine_name << std::endl;
+        }
+        std::cout << response_str << std::endl;
+        if (response_str == "login successful") {
+            // 登录成功
+            data["state"] = response_str;
+            data["machine_name"] = machine_name_array;
+            data["account_num"] = account_num;
+            return true;
+        } else {
+            // 失败
+            data["state"] = "error";
+            return false;
+        }
+    }
+
+    nlohmann::json data;
+    std::string response_str;
+    std::vector<std::string> machine_name_array;
+};
+
 }  // namespace monitor

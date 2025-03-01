@@ -6,6 +6,8 @@
 namespace monitor {
 bool QueryData::queryDataInfo(std::string account_num, std::string machine_name,
                               int count, monitor::RpcClient& rpc_client) {
+    this->account_num = account_num;
+    this->machine_name = machine_name;
     GetCurTime cur_time;
     // sql:
     // select * from table_20241126 t WHERE user_id = (SELECT id FROM `user` u
