@@ -205,12 +205,25 @@
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             })
-            .then(response => response.text())
+            .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // 将响应解析为 JSON
+                })
             .then(data => {
-                if (data === 'Login successful') {
+                if (data.state === 'login successful') {
+                    const account_num=  data.account_num;
+                    const machine_name = data.machine_name;
+                    const json_data = {
+                        account_num: data.account_num,
+                        machine_name: data.machine_name
+                    };
+                    document.cookie = JSON.stringify(json_data);
+                    console.log(document.cookie);
                     window.location.href = '/home.html'; // 跳转到主页
                 } else {
-                    document.getElementById('errorMessage').textContent = data;
+                    document.getElementById('errorMessage').textContent = data.state;
                 }
             })
             .catch(error => {

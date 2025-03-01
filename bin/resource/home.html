@@ -104,6 +104,21 @@
             height: auto !important;
         }
 
+        /* 下拉框样式 */
+        .dropdown {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .dropdown select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .container {
@@ -136,6 +151,13 @@
 </head>
 <body>
     <h1 style="text-align: center;">GPU Monitor Panel</h1>
+    <!-- 下拉选项框 -->
+    <div class="dropdown">
+        <label for="gpuDropdown">选择机器名：</label>
+        <select id="gpuDropdown">
+        </select>
+    </div>
+
     <div class="container">
         <!-- 显卡信息 -->
         <div class="card" id="basicInfoCard">
@@ -189,7 +211,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-
         // 数据修改接口
         const updateData = {
             // 更新用户信息
@@ -214,7 +235,7 @@
                 document.getElementById('memoryUsage').textContent = `${usage}%`;
                 document.getElementById('memoryUsageBar').style.width = `${usage}%`;
             },
-            // 更新 RAM 使用率
+            // 更新 GPU 使用率
             setGpuUsage: (usage) => {
                 document.getElementById('gpuUsage').textContent = `${usage}%`;
                 document.getElementById('gpuUsageBar').style.width = `${usage}%`;
@@ -228,12 +249,10 @@
                 gpuChart.data.datasets[0].data = usage;
                 gpuChart.update();
             },
-
             setNetUpLoad: (usage) => {
                 trafficChart.data.datasets[0].data = usage;
                 trafficChart.update();
             },
-
             setNetDownLoad: (usage) => {
                 trafficChart.data.datasets[1].data = usage;
                 trafficChart.update();
@@ -243,12 +262,28 @@
                 trafficChart.data.labels = usage;
                 trafficChart.update();
                 gpuChart.update();
+            },
+            setMachine: (usage) => {
+                console.log(usage);
+                const gpuDropdown = document.getElementById('gpuDropdown');
+                gpuDropdown.innerHTML = '';
+                for (const machine of usage) {
+                    const option = document.createElement('option');
+                    option.value = machine;
+                    option.textContent = machine;
+                    gpuDropdown.appendChild(option);
+                }
             }
         };
 
-        // 新增：定时获取服务器数据
-        const fetchServerData = () => {
-            fetch('/data') // 假设服务器接口是 /api/data
+
+        // 定时获取服务器数据
+        const fetchServerData = (endpoint = '/data', params = {}) => {
+                // 将参数拼接到URL中（如果需要）
+                const url = new URL(endpoint, window.location.origin);
+                Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+                console.log('Final URL:', url.href);
+                fetch(url.href) // 使用动态的URL
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -258,48 +293,58 @@
                 .then(data => {
                     console.log('Server data:', data); // 打印解析后的数据
                     // 在这里处理数据，例如更新页面内容
-                    if (data.userInfo!== undefined) {
+                    if (data.userInfo !== undefined) {
                         updateData.setUserInfo(data.userInfo);
                     }
-                    if (data.gpuModel!== undefined) {
+                    if (data.gpuModel !== undefined) {
                         updateData.setGpuModel(data.gpuModel);
                     }
-                    if (data.cpuUsage!== undefined) {
+                    if (data.cpuUsage !== undefined) {
                         updateData.setCpuUsage(data.cpuUsage);
                     }
-                    if (data.memoryUsage!== undefined) {
+                    if (data.memoryUsage !== undefined) {
                         updateData.setMemoryUsage(data.memoryUsage);
                     }
                     if (data.gpuUsage !== undefined) {
                         updateData.setGpuUsage(data.gpuUsage);
                     }
-                    if (data.vramUsage!== undefined) {
+                    if (data.vramUsage !== undefined) {
                         updateData.setVramUsage(data.vramUsage);
                     }
-                    if(data.gpuChart!== undefined)
-                    {
+                    if (data.gpuChart !== undefined) {
                         updateData.setGpuChart(data.gpuChart);
                     }
-                    if(data.netUpload!== undefined)
-                    {
+                    if (data.netUpload !== undefined) {
                         updateData.setNetUpLoad(data.netUpload);
                     }
-                    if(data.netDownload!== undefined)
-                    {
+                    if (data.netDownload !== undefined) {
                         updateData.setNetDownLoad(data.netDownload);
                     }
-                    if(data.time !== undefined)
-                    {
+                    if (data.time !== undefined) {
                         updateData.setTime(data.time);
+                    }
+                    if (data.machine !== undefined) {
+                        updateData.setMachine(data.machine);
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching server data:', error);
                 });
         };
-        
-        fetchServerData();
 
+        const cookie_json = JSON.parse(document.cookie);
+        updateData.setUserInfo(cookie_json.account_num);
+        updateData.setMachine(cookie_json.machine_name);
+        console.log(document.getElementById('userInfo').textContent);
+        console.log(document.getElementById('gpuDropdown').value);
+        console.log({account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value });
+        fetchServerData('/data',{account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value });
+
+        // 下拉框事件监听
+        gpuDropdown.addEventListener('change', function () {
+            const selectedMachine = document.getElementById('gpuDropdown').value;
+            fetchServerData('/data',{account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value });
+        });
         // GPU 使用率图表
         const gpuCtx = document.getElementById('gpuChart').getContext('2d');
         const gpuChart = new Chart(gpuCtx, {
@@ -329,6 +374,7 @@
                 }
             }
         });
+
         // 流量收发情况图表
         const trafficCtx = document.getElementById('trafficChart').getContext('2d');
         const trafficChart = new Chart(trafficCtx, {
@@ -366,10 +412,10 @@
                         beginAtZero: true
                     }
                 }
-            }
+            } 
         });
 
-        setInterval(fetchServerData, 5000);
+        setInterval(fetchServerData('/data',{account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value }), 5000);
     </script>
 </body>
 </html>

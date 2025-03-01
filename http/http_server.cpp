@@ -16,7 +16,7 @@
 #include "query_data.h"
 using namespace muduo;
 using namespace muduo::net;
-using json = nlohmann::json;
+// using json = nlohmann::json;
 
 int h_argv;
 char** h_argc;
@@ -53,8 +53,22 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
     } else if (path == "/data") {
         monitor::RpcClient rpc_client;
         monitor::QueryData query_data;
-        std::string account_num = "000001";
-        std::string machine_name = "test";
+
+        const std::string& request_query = req.query();
+        // 定义正则表达式
+        std::regex pattern(R"(\?account_num=([^&]+)&machine_name=([^&]+))");
+        // 用于存储匹配结果
+        std::smatch matches;
+        // 解析表单数据（格式为 username=admin&password=password123）
+        std::string account_num, machine_name;
+        // 进行匹配
+        if (std::regex_match(request_query, matches, pattern)) {
+            // 提取捕获组
+            account_num = matches[1];
+            machine_name = matches[2];
+        }
+        std::cout << "account_num:" << account_num << std::endl;
+        std::cout << "machine_name" << machine_name << std::endl;
         if (query_data.queryDataInfo(account_num, machine_name, 5,
                                      rpc_client)) {
             resp->setStatusCode(HttpResponse::k200Ok);
@@ -77,19 +91,19 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
             username = matches[1];
             password = matches[2];
         }
+        monitor::Login l;
 
         // 验证账号和密码
-        if (users.find(username) != users.end() &&
-            users[username] == password) {
+        if (l.login(username, password)) {
             resp->setStatusCode(HttpResponse::k200Ok);
             resp->setStatusMessage("OK");
             resp->setContentType("text/plain");
-            resp->setBody("Login successful");
+            resp->setBody(l.data.dump());
         } else {
             resp->setStatusCode(HttpResponse::k400BadRequest);
             resp->setStatusMessage("Unauthorized");
             resp->setContentType("text/plain");
-            resp->setBody("Invalid username or password");
+            resp->setBody(l.data.dump());
         }
     } else {
         // 其他请求返回 404
