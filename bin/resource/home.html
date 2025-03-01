@@ -154,8 +154,7 @@
     <!-- 下拉选项框 -->
     <div class="dropdown">
         <label for="gpuDropdown">选择机器名：</label>
-        <select id="gpuDropdown">
-        </select>
+        <select id="gpuDropdown"></select>
     </div>
 
     <div class="container">
@@ -278,7 +277,8 @@
 
 
         // 定时获取服务器数据
-        const fetchServerData = (endpoint = '/data', params = {}) => {
+        const fetchServerData = (endpoint = '/data') => {
+                const params = {account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value };
                 // 将参数拼接到URL中（如果需要）
                 const url = new URL(endpoint, window.location.origin);
                 Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
@@ -323,9 +323,6 @@
                     if (data.time !== undefined) {
                         updateData.setTime(data.time);
                     }
-                    if (data.machine !== undefined) {
-                        updateData.setMachine(data.machine);
-                    }
                 })
                 .catch(error => {
                     console.error('Error fetching server data:', error);
@@ -338,12 +335,11 @@
         console.log(document.getElementById('userInfo').textContent);
         console.log(document.getElementById('gpuDropdown').value);
         console.log({account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value });
-        fetchServerData('/data',{account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value });
-
+        fetchServerData('/data');
         // 下拉框事件监听
         gpuDropdown.addEventListener('change', function () {
             const selectedMachine = document.getElementById('gpuDropdown').value;
-            fetchServerData('/data',{account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value });
+            fetchServerData('/data');
         });
         // GPU 使用率图表
         const gpuCtx = document.getElementById('gpuChart').getContext('2d');
@@ -415,7 +411,7 @@
             } 
         });
 
-        setInterval(fetchServerData('/data',{account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value }), 5000);
+        setInterval(fetchServerData, 5000,'/data');
     </script>
 </body>
 </html>
