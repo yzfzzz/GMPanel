@@ -26,7 +26,7 @@
 
 
 ## ✨特色
-![系统架构](./doc/img/系统架构.PNG)
+![系统架构](./doc/img/系统架构.png)
 
 1. 采用SOA架构，监控端、服务端、客户端代码分离
 2. 采用自制的 [mprpc](https://github.com/yzfzzz/mprpc) 微服务架构，不依赖第三方rpc框架（如grpc、brpc等）
