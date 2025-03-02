@@ -47,7 +47,7 @@ class QueryData {
     std::string machine_name;
 };
 
-class Login {
+class UserManage {
    public:
     bool login(std::string account_num, std::string pwd) {
         monitor::RpcClient rpc_client;
@@ -69,6 +69,27 @@ class Login {
             data["state"] = response_str;
             data["machine_name"] = machine_name_array;
             data["account_num"] = account_num;
+            return true;
+        } else {
+            // 失败
+            data["state"] = "error";
+            return false;
+        }
+    }
+
+    bool signup(std::string pwd) {
+        std::string account_num;
+        monitor::RpcClient rpc_client;
+        monitor::proto::UserMessage request;
+        monitor::proto::UserResponseMessage response;
+        request.set_account_num(account_num);
+        request.set_pwd(pwd);
+        rpc_client.LoginRegister(request, response);
+        response_str = response.response_str();
+        std::cout << response_str << std::endl;
+        if (!response_str.empty()) {
+            // 注册成功
+            data["state"] = response_str;
             return true;
         } else {
             // 失败

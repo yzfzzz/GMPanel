@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Signup Page</title>
     <style>
+        /* CSS 样式 */
         * {
             font-family: "Poppins", sans-serif;
             margin: 0;
@@ -33,11 +34,6 @@
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(15px);
-        }
-
-        .wrapper:hover {
-            box-shadow: 0 0 40px rgba(255,255,255,0.5);
-            background: #46474e;
         }
 
         .wrapper h1 {
@@ -88,29 +84,6 @@
             line-height: 57px;
         }
 
-        .wrapper .row {
-            margin: -15px 0 15px;
-            font-size: 0.9em;
-            color: #fff;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .wrapper .row label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .wrapper .row a {
-            color: #fff;
-            text-decoration: none;
-        }
-
-        .wrapper .options a:hover {
-            text-decoration: underline;
-        }
-
         .wrapper .btn {
             width: 100%;
             height: 40px;
@@ -129,49 +102,33 @@
             background: #ffffea;
         }
 
-        .wrapper .signup-link {
+        .wrapper .login-link {
             font-size: 0.9em;
             color: #fff;
             text-align: center;
             margin: 25px 0 10px;
         }
 
-        .wrapper .signup-link a {
+        .wrapper .login-link a {
             color: #fff;
             text-decoration: none;
             font-weight: 600;
         }
 
-        .wrapper .signup-link a:hover {
+        .wrapper .login-link a:hover {
             text-decoration: underline;
-        }
-
-        @media (max-width: 360px) {
-            .wrapper {
-                width: 100%;
-                height: 100vh;
-                border: none;
-                border-radius: 0px;
-            }
-
-            .wrapper .input-box {
-                width: 290px;
-            }
-            #img {
-                z-index: -90;
-            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
     <div class="wrapper">
-        <form id="loginForm">
-            <h1>Login</h1>
+        <form id="signupForm">
+            <h1>Sign Up</h1>
             <div class="input-box">
                 <i class="fas fa-envelope icon"></i>
-                <input id="usernameInput" type="text" name="username" required />
-                <label>Username</label>
+                <input id="emailInput" type="email" name="email" required />
+                <label>Email</label>
             </div>
             <div class="input-box">
                 <i class="fas fa-lock icon"></i>
@@ -179,49 +136,41 @@
                 <label>Password</label>
             </div>
 
-            <div class="row">
-                <a onclick="forgotman()">Forgot password?</a>
-            </div>
+            <button type="submit" class="btn">Sign Up</button>
 
-            <button type="submit" class="btn">Login</button>
-
-            <div class="signup-link">
-                <p>Don't have an account? <a href="register.html">Create one.</a></p>
+            <div class="login-link">
+                <p>Already have an account? <a href="index.html">Login here.</a></p>
             </div>
         </form>
         <div id="errorMessage" class="error-message"></div>
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
+        // JavaScript 逻辑
+        document.getElementById('signupForm').addEventListener('submit', function(event) {
             event.preventDefault(); // 阻止表单默认提交行为
 
             const formData = new FormData(this);
             const params = new URLSearchParams(formData).toString();
 
-            fetch(`/login?${params}`, {
+            fetch(`/signup?${params}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             })
             .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json(); // 将响应解析为 JSON
-                })
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // 将响应解析为 JSON
+            })
             .then(data => {
-                if (data.state === 'login successful') {
-                    const account_num=  data.account_num;
-                    const machine_name = data.machine_name;
-                    const json_data = {
-                        account_num: data.account_num,
-                        machine_name: data.machine_name
-                    };
-                    document.cookie = JSON.stringify(json_data);
-                    console.log(document.cookie);
-                    window.location.href = '/home.html'; // 跳转到主页
+                if (data.state) {
+                    alert(data.state);
+                    setTimeout(function() {
+                        window.location.href = 'index.html';
+                    }, 2000); // 5000 毫秒 = 5 秒
                 } else {
                     document.getElementById('errorMessage').textContent = data.state;
                 }
@@ -230,10 +179,6 @@
                 console.error('Error:', error);
             });
         });
-
-        function forgotman() {
-            alert("Forgot password functionality not implemented yet.");
-        }
     </script>
 </body>
 </html>

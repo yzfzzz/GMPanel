@@ -31,7 +31,8 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
              << " Version: " << req.getVersion();
 
     std::string path = req.path();
-    if (path == "/" || path == "/index.html" || path == "/home.html") {
+    if (path == "/" || path == "/index.html" || path == "/home.html" ||
+        path == "/register.html") {
         if (path == "/") {
             path = "/index.html";
         }
@@ -77,6 +78,34 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
             resp->setBody(query_data.toJsonStr());
         }
 
+    } else if (path == "/signup") {
+        const std::string& request_query = req.query();
+        // 定义正则表达式
+        std::regex pattern(R"(\?email=([^&]+)&password=([^&]+))");
+        // 用于存储匹配结果
+        std::smatch matches;
+        // 解析表单数据（格式为 username=admin&password=password123）
+        std::string email, password;
+        // 进行匹配
+        if (std::regex_match(request_query, matches, pattern)) {
+            // 提取捕获组
+            email = matches[1];
+            password = matches[2];
+        }
+        monitor::UserManage user_manage;
+
+        if (!password.empty() && user_manage.signup(password)) {
+            // 注册
+            resp->setStatusCode(HttpResponse::k200Ok);
+            resp->setStatusMessage("OK");
+            resp->setContentType("text/plain");
+            resp->setBody(user_manage.data.dump());
+        } else {
+            resp->setStatusCode(HttpResponse::k400BadRequest);
+            resp->setStatusMessage("Unauthorized");
+            resp->setContentType("text/plain");
+            resp->setBody("Invalid username or password");
+        }
     } else if (path == "/login") {
         const std::string& request_query = req.query();
         // 定义正则表达式
@@ -91,19 +120,20 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
             username = matches[1];
             password = matches[2];
         }
-        monitor::Login l;
+        monitor::UserManage user_manage;
 
-        // 验证账号和密码
-        if (l.login(username, password)) {
+        if (!username.empty() && !password.empty() &&
+            user_manage.login(username, password)) {
+            // 登录
             resp->setStatusCode(HttpResponse::k200Ok);
             resp->setStatusMessage("OK");
             resp->setContentType("text/plain");
-            resp->setBody(l.data.dump());
+            resp->setBody(user_manage.data.dump());
         } else {
             resp->setStatusCode(HttpResponse::k400BadRequest);
             resp->setStatusMessage("Unauthorized");
             resp->setContentType("text/plain");
-            resp->setBody(l.data.dump());
+            resp->setBody("Invalid username or password");
         }
     } else {
         // 其他请求返回 404
