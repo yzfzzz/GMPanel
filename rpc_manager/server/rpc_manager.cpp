@@ -1,8 +1,8 @@
+#include "rpc_manager.h"
 #include <iostream>
 #include "get_time.h"
 #include "json.hpp"
 #include "log.h"
-#include "rpc_manager.h"
 namespace monitor {
 
 ServerManagerImpl::ServerManagerImpl() {}
@@ -100,8 +100,9 @@ bool ServerManagerImpl::insertOneInfo(
     MidInfo mid_info = parseInfos(monitor_infos_);
 
     std::string table_name = "table_" + mid_info.timeymd;
+    std::cout << "table_name: " << table_name << std::endl;
     if (!isTableExist(table_name, conn_ptr)) {
-        // LOG(WARNING) << "Failed to select table!";
+        LOG(WARNING) << "Failed to select table!";
         return false;
     }
 
@@ -180,9 +181,14 @@ bool ServerManagerImpl::isTableExist(std::string table_name,
                                      std::shared_ptr<MysqlConn> conn_ptr) {
     std::string sql = "SELECT * FROM tableRegister tr WHERE table_name = '" +
                       table_name + "'";
-    // LOG(INFO) << "isTableExist select tableRegister SQL: " << sql;
+    LOG(INFO) << "isTableExist select tableRegister SQL: " << sql;
     if (conn_ptr->query(sql) == true) {
+        std::cout << "Current file: " << __FILE__ << std::endl;
+        std::cout << "Current function: " << __func__ << std::endl;
+        std::cout << "Current line: " << __LINE__ << std::endl;
+        LOG(INFO) << "" << sql;
         if (conn_ptr->next()) {
+            LOG(INFO) << "finish conn_ptr->next()";
             return true;
         } else {
             // 新建一个表
@@ -283,8 +289,8 @@ std::string UserManagerImpl::registerNewUser() {
                 sql = "INSERT INTO `user` (password,accountnum) values('" +
                       pwd_ + "','" + gen_number + "')";
                 if (conn_ptr->query(sql)) {
-                    response = "register successful, account:" + gen_number +
-                               ", automatically jump after 10s";
+                    response = "注册成功, 账号:" + gen_number +
+                               ", 点击确定自动跳转登录界面";
                 }
             }
         }

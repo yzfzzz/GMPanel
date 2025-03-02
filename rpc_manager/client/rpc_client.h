@@ -19,6 +19,7 @@ class RpcClient {
                        monitor::proto::UserResponseMessage& response);
 
    public:
+    // 每个service对应着一个指针
     std::unique_ptr<monitor::proto::MonitorManager_Stub> stub_ptr_;
     std::unique_ptr<monitor::proto::UserManager_Stub> user_stub_ptr_;
 };
