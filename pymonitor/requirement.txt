@@ -1,0 +1,6 @@
+pyyaml
+pynvml
+kazoo
+psutil
+grpcio-tools
+protobuf==5.29.0

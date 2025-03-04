@@ -16,8 +16,6 @@ import "os.proto";
 
 option cc_generic_services = false;
 
-
-
 message MonitorInfo {
     string name = 1;
     OS os = 2;

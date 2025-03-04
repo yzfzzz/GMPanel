@@ -1,0 +1,11 @@
+syntax = "proto3";
+package monitor.proto;
+
+message HardDisk {
+    // 磁盘总空间: 325.69 GB
+    // 磁盘已用空间: 298.83 GB
+    // 磁盘使用率: 91.8% 
+    float total = 1;
+    float used = 2;
+    float used_percent = 3;
+  }
