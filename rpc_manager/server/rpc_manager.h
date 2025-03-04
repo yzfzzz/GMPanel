@@ -1,4 +1,5 @@
 #pragma once
+#include <grpcpp/support/status.h>
 #include <cstdlib>
 #include <ctime>
 #include <memory>
@@ -8,26 +9,24 @@
 #include <unordered_map>
 #include "connection_pool.h"
 #include "midinfo.h"
+#include "monitor_info.grpc.pb.h"
 #include "monitor_info.pb.h"
-#include "mprpcapplication.h"
 #include "mysql_conn.h"
-#include "rpcprovider.h"
 namespace monitor {
 
-class ServerManagerImpl : public monitor::proto::MonitorManager {
+class ServerManagerImpl : public monitor::proto::MonitorManager::Service {
    public:
     ServerManagerImpl();
     virtual ~ServerManagerImpl();
 
-    void SetMonitorInfo(::google::protobuf::RpcController* controller,
-                        const ::monitor::proto::MonitorInfo* request,
-                        ::google::protobuf::Empty* response,
-                        ::google::protobuf::Closure* done);
+    ::grpc::Status SetMonitorInfo(::grpc::ServerContext* context,
+                                  const ::monitor::proto::MonitorInfo* request,
+                                  ::google::protobuf::Empty* response);
 
-    void GetMonitorInfo(::google::protobuf::RpcController* controller,
-                        const ::monitor::proto::QueryMessage* request,
-                        ::monitor::proto::QueryResults* response,
-                        ::google::protobuf::Closure* done);
+    ::grpc::Status GetMonitorInfo(::grpc::ServerContext* context,
+                                  const ::monitor::proto::QueryMessage* request,
+                                  ::monitor::proto::QueryResults* response);
+
     // 插入一条数据
     bool insertOneInfo(monitor::proto::MonitorInfo& monitor_infos_);
     // 根据账号名查询用户id
@@ -63,15 +62,15 @@ class ServerManagerImpl : public monitor::proto::MonitorManager {
         "utf8_general_ci COMMENT='create table according to date'";
 };
 
-class UserManagerImpl : public monitor::proto::UserManager {
+class UserManagerImpl : public monitor::proto::UserManager::Service {
    public:
     UserManagerImpl();
     virtual ~UserManagerImpl();
 
-    void LoginRegister(::google::protobuf::RpcController* controller,
-                       const ::monitor::proto::UserMessage* request,
-                       ::monitor::proto::UserResponseMessage* response,
-                       ::google::protobuf::Closure* done);
+    ::grpc::Status LoginRegister(
+        ::grpc::ServerContext* context,
+        const ::monitor::proto::UserMessage* request,
+        ::monitor::proto::UserResponseMessage* response);
 
     std::string verifyLoginInformation();
     std::string registerNewUser();

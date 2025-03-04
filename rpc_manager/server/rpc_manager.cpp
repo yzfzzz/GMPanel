@@ -10,27 +10,24 @@ ServerManagerImpl::~ServerManagerImpl() {}
 UserManagerImpl ::UserManagerImpl() {}
 UserManagerImpl ::~UserManagerImpl() {}
 
-void ServerManagerImpl::SetMonitorInfo(
-    ::google::protobuf::RpcController* controller,
-    const ::monitor::proto::MonitorInfo* request,
-    ::google::protobuf::Empty* response, ::google::protobuf::Closure* done) {
+::grpc::Status ServerManagerImpl::SetMonitorInfo(::grpc::ServerContext* context,
+                              const ::monitor::proto::MonitorInfo* request,
+                              ::google::protobuf::Empty* response) {
     std::lock_guard<std::mutex> lock(set_mutex_);
     LOG(INFO) << "RPC Call: ServerManagerImpl::SetMonitorInfo";
     monitor_infos_.Clear();
     monitor_infos_ = *request;
     insertOneInfo(monitor_infos_);
-    done->Run();
+    return grpc::Status::OK;
 }
 
-void ServerManagerImpl::GetMonitorInfo(
-    ::google::protobuf::RpcController* controller,
-    const ::monitor::proto::QueryMessage* request,
-    ::monitor::proto::QueryResults* response,
-    ::google::protobuf::Closure* done) {
+::grpc::Status ServerManagerImpl::GetMonitorInfo(::grpc::ServerContext* context,
+                              const ::monitor::proto::QueryMessage* request,
+                              ::monitor::proto::QueryResults* response) {
     std::lock_guard<std::mutex> lock(get_mutex_);
     // LOG(INFO) << "RPC Call: ServerManagerImpl::GetMonitorInfo";
     *response = queryDataInfo(request);
-    done->Run();
+    return grpc::Status::OK;
 }
 
 ::monitor::proto::QueryResults ServerManagerImpl::queryDataInfo(
@@ -63,32 +60,50 @@ MidInfo ServerManagerImpl::parseInfos(
     monitor::proto::MonitorInfo& monitor_infos_) {
     MidInfo mid_info;
     mid_info.gpu_num = monitor_infos_.gpu_info_size();
-    if (monitor_infos_.gpu_info_size() > 0) {
-        mid_info.gpu_name = monitor_infos_.gpu_info(0).gpu_name();
-        mid_info.gpu_used_mem = monitor_infos_.gpu_info(0).gpu_mem_used();
-        mid_info.gpu_total_mem = monitor_infos_.gpu_info(0).gpu_mem_total();
-        mid_info.gpu_avg_util = monitor_infos_.gpu_info(0).gpu_mem_utilize();
+    for (int i = 0; i < monitor_infos_.gpu_info_size(); i++) {
+        mid_info.gpu_name.push_back(monitor_infos_.gpu_info(i).gpu_name());
+        mid_info.gpu_avg_util.push_back(
+            monitor_infos_.gpu_info(i).gpu_mem_utilize());
+        mid_info.gpu_temperture.push_back(
+            monitor_infos_.gpu_info(i).temperture());
+        mid_info.gpu_total_mem.push_back(
+            monitor_infos_.gpu_info(i).gpu_mem_total());
+        mid_info.gpu_used_mem.push_back(
+            monitor_infos_.gpu_info(i).gpu_mem_used());
     }
     mid_info.cpu_load_avg_1 = monitor_infos_.cpu_load().load_avg_1();
     mid_info.cpu_load_avg_3 = monitor_infos_.cpu_load().load_avg_3();
     mid_info.cpu_load_avg_15 = monitor_infos_.cpu_load().load_avg_15();
-    mid_info.mem_used = monitor_infos_.mem_info().used_percent();
-    mid_info.mem_total = monitor_infos_.mem_info().total();
-    if (monitor_infos_.net_info_size() > 0) {
-        float send_sum = 0;
-        float rcv_sum = 0;
-        for (int i = 0; i < monitor_infos_.net_info_size(); i++) {
-            send_sum += monitor_infos_.net_info(i).send_rate();
-            rcv_sum += monitor_infos_.net_info(i).rcv_rate();
-        }
-        mid_info.net_send_rate = send_sum / monitor_infos_.net_info_size();
-        mid_info.net_rcv_rate = rcv_sum / monitor_infos_.net_info_size();
+
+    mid_info.cpu_percent = monitor_infos_.cpu_stat().cpu_percent();
+    mid_info.cpu_logic_num = monitor_infos_.cpu_stat().cpu_logic_num();
+    mid_info.cpu_physical_core_num =
+        monitor_infos_.cpu_stat().cpu_physical_core_num();
+    mid_info.cpu_used_percent = monitor_infos_.cpu_stat().cpu_used_percent();
+    for (int i = 0;
+         i < monitor_infos_.cpu_stat().each_core_utilization_rate_size(); i++) {
+        mid_info.each_core_utilization_rate.push_back(
+            monitor_infos_.cpu_stat().each_core_utilization_rate(i));
     }
+
+    mid_info.mem_used_percent = monitor_infos_.mem_info().used_percent();
+    mid_info.mem_total = monitor_infos_.mem_info().total();
+
+    mid_info.net_send_rate = monitor_infos_.net_info().send_rate();
+    mid_info.net_rcv_rate = monitor_infos_.net_info().rcv_rate();
+
+    mid_info.hard_disk_total = monitor_infos_.hard_disk().total();
+    mid_info.hard_disk_used = monitor_infos_.hard_disk().used();
+    mid_info.hard_disk_used_percent = monitor_infos_.hard_disk().used_percent();
+
+    mid_info.os_name = monitor_infos_.os().os_name();
+    mid_info.os_startup_time = monitor_infos_.os().os_startup_time();
     mid_info.accountnum = monitor_infos_.accountnum();
     mid_info.machine_name = monitor_infos_.machine_name();
     mid_info.timeymd = monitor_infos_.time().timeymd();
     mid_info.timehms = monitor_infos_.time().timehms();
-    // LOG(INFO) << "Parse monitor_infos_...";
+    LOG(INFO) << "Parse monitor_infos_...";
+    mid_info.printInfo();
     return mid_info;
 }
 
@@ -99,45 +114,47 @@ bool ServerManagerImpl::insertOneInfo(
 
     MidInfo mid_info = parseInfos(monitor_infos_);
 
-    std::string table_name = "table_" + mid_info.timeymd;
-    std::cout << "table_name: " << table_name << std::endl;
-    if (!isTableExist(table_name, conn_ptr)) {
-        LOG(WARNING) << "Failed to select table!";
-        return false;
-    }
+    return true;
 
-    std::string sql =
-        "INSERT INTO " + table_name +
-        "(gpu_name, gpu_num, gpu_used_mem, gpu_total_mem, gpu_avg_util, " +
-        "cpu_load_avg_1, cpu_load_avg_3, cpu_load_avg_15, mem_used,mem_total," +
-        "net_send_rate, net_rcv_rate, user_id, time, machine_name) " +
-        "VALUES(";
+    // std::string table_name = "table_" + mid_info.timeymd;
+    // std::cout << "table_name: " << table_name << std::endl;
+    // if (!isTableExist(table_name, conn_ptr)) {
+    //     LOG(WARNING) << "Failed to select table!";
+    //     return false;
+    // }
 
-    std::string user_id = selectUserId(mid_info.accountnum);
-    isMachineExist(user_id, mid_info.machine_name);
-    if (user_id.empty() == true) {
-        return false;
-    }
-    sql = sql + "'" + mid_info.gpu_name + "'" + "," +
-          std::to_string(mid_info.gpu_num) + "," +
-          std::to_string(mid_info.gpu_used_mem) + "," +
-          std::to_string(mid_info.gpu_total_mem) + "," +
-          std::to_string(mid_info.gpu_avg_util) + "," +
-          std::to_string(mid_info.cpu_load_avg_1) + "," +
-          std::to_string(mid_info.cpu_load_avg_3) + "," +
-          std::to_string(mid_info.cpu_load_avg_15) + "," +
-          std::to_string(mid_info.mem_used) + "," +
-          std::to_string(mid_info.mem_total) + "," +
-          std::to_string(mid_info.net_send_rate) + "," +
-          std::to_string(mid_info.net_rcv_rate) + "," + user_id + "," + "'" +
-          mid_info.timehms + "'" + ",'" + mid_info.machine_name + "')";
-    LOG(INFO) << "InsertOneInfo SQL: " << sql;
-    if (conn_ptr->update(sql)) {
-        // LOG(INFO) << "Succeed to insert one sql";
-        return true;
-    }
-    // LOG(WARNING) << "Failed to insert one sql";
-    return false;
+    // std::string sql =
+    //     "INSERT INTO " + table_name +
+    //     "(gpu_name, gpu_num, gpu_used_mem, gpu_total_mem, gpu_avg_util, " +
+    //     "cpu_load_avg_1, cpu_load_avg_3, cpu_load_avg_15,
+    //     mem_used,mem_total," + "net_send_rate, net_rcv_rate, user_id, time,
+    //     machine_name) " + "VALUES(";
+
+    // std::string user_id = selectUserId(mid_info.accountnum);
+    // isMachineExist(user_id, mid_info.machine_name);
+    // if (user_id.empty() == true) {
+    //     return false;
+    // }
+    // sql = sql + "'" + mid_info.gpu_name + "'" + "," +
+    //       std::to_string(mid_info.gpu_num) + "," +
+    //       std::to_string(mid_info.gpu_used_mem) + "," +
+    //       std::to_string(mid_info.gpu_total_mem) + "," +
+    //       std::to_string(mid_info.gpu_avg_util) + "," +
+    //       std::to_string(mid_info.cpu_load_avg_1) + "," +
+    //       std::to_string(mid_info.cpu_load_avg_3) + "," +
+    //       std::to_string(mid_info.cpu_load_avg_15) + "," +
+    //       std::to_string(mid_info.mem_used) + "," +
+    //       std::to_string(mid_info.mem_total) + "," +
+    //       std::to_string(mid_info.net_send_rate) + "," +
+    //       std::to_string(mid_info.net_rcv_rate) + "," + user_id + "," + "'" +
+    //       mid_info.timehms + "'" + ",'" + mid_info.machine_name + "')";
+    // LOG(INFO) << "InsertOneInfo SQL: " << sql;
+    // if (conn_ptr->update(sql)) {
+    //     // LOG(INFO) << "Succeed to insert one sql";
+    //     return true;
+    // }
+    // // LOG(WARNING) << "Failed to insert one sql";
+    // return false;
 }
 
 std::string ServerManagerImpl::selectUserId(std::string accountNum) {
@@ -210,11 +227,9 @@ bool ServerManagerImpl::isTableExist(std::string table_name,
     return false;
 }
 
-void UserManagerImpl::LoginRegister(
-    ::google::protobuf::RpcController* controller,
-    const ::monitor::proto::UserMessage* request,
-    ::monitor::proto::UserResponseMessage* response,
-    ::google::protobuf::Closure* done) {
+::grpc::Status UserManagerImpl::LoginRegister(::grpc::ServerContext* context,
+                             const ::monitor::proto::UserMessage* request,
+                             ::monitor::proto::UserResponseMessage* response) {
     LOG(INFO) << "RPC Call: UserManagerImpl::LoginRegister";
     account_num_ = request->account_num();
     pwd_ = request->pwd();
@@ -226,7 +241,7 @@ void UserManagerImpl::LoginRegister(
     queryUserMachineName(response);
     account_num_.clear();
     pwd_.clear();
-    done->Run();
+    return grpc::Status::OK;
 }
 
 std::string UserManagerImpl::verifyLoginInformation() {

@@ -1,23 +1,24 @@
+#include <grpc/grpc.h>
+#include <grpcpp/server_builder.h>
 #include <iostream>
-#include <string>
-#include <vector>
-#include "log.h"
 #include "rpc_manager.h"
 
-int main(int argv, char** argc) {
-    std::string log_path = "./logs";
-    monitor::SetupLogging(log_path);
-    // 调用框架的初始化操作
-    MprpcApplication::Init(argv, argc);
+constexpr char kServerPortInfo[] = "0.0.0.0:50051";
 
-    RpcProvider provider;
+void InitServer() {
+    grpc::ServerBuilder builder;
+    builder.AddListeningPort(kServerPortInfo,
+                             grpc::InsecureServerCredentials());
+    monitor::ServerManagerImpl server_manager;
+    monitor::UserManagerImpl user_manager;
+    builder.RegisterService(&server_manager);
+    builder.RegisterService(&user_manager);
+    std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
+    server->Wait();
+    return;
+}
 
-    // 在zookeeper中挂载函数
-    provider.NotifyService(new monitor::ServerManagerImpl());
-    provider.NotifyService(new monitor::UserManagerImpl());
-
-    // 启动一个rpc服务发布节点, Run以后进程进入阻塞状态，等待远程的rpc调用请求
-    provider.Run();
-
+int main() {
+    InitServer();
     return 0;
 }

@@ -1,32 +1,56 @@
-#include "mprpcapplication.h"
 #include "rpc_client.h"
 
 namespace monitor {
-RpcClient::RpcClient(const std::string& server_address)
-    : stub_ptr_(std::make_unique<monitor::proto::MonitorManager_Stub>(
-          new MprpcChannel())), user_stub_ptr_(std::make_unique<monitor::proto::UserManager_Stub>(
-          new MprpcChannel())) {}
+
+RpcClient::RpcClient(const std::string& server_address) {
+    stub_ptr_ = monitor::proto::MonitorManager::NewStub(grpc::CreateChannel(
+        server_address, grpc::InsecureChannelCredentials()));
+    user_stub_ptr_ = monitor::proto::UserManager::NewStub(grpc::CreateChannel(
+        server_address, grpc::InsecureChannelCredentials()));
+}
 RpcClient::~RpcClient() {}
 
 void RpcClient::SetMonitorInfo(
     const monitor::proto::MonitorInfo& monitor_info) {
-    // monitor::proto::MonitorInfo request;
+    ::grpc::ClientContext context;
     ::google::protobuf::Empty response;
-    MprpcController controller;
-    stub_ptr_->SetMonitorInfo(&controller, &monitor_info, &response, nullptr);
+    ::grpc::Status status =
+        stub_ptr_->SetMonitorInfo(&context, monitor_info, &response);
+
+    if (status.ok()) {
+    } else {
+        std::cout << status.error_details() << std::endl;
+        std::cout << "status.error_message: " << status.error_message()
+                  << std::endl;
+        std::cout << "falied to connect !!!" << std::endl;
+    }
 }
 
 void RpcClient::GetMonitorInfo(monitor::proto::QueryMessage& request,
                                monitor::proto::QueryResults& response) {
-    MprpcController controller;
-    // monitor::proto::MonitorInfo response;
-    stub_ptr_->GetMonitorInfo(&controller, &request, &response, nullptr);
+    ::grpc::ClientContext context;
+    ::grpc::Status status =
+        stub_ptr_->GetMonitorInfo(&context, request, &response);
+    if (status.ok()) {
+    } else {
+        std::cout << status.error_details() << std::endl;
+        std::cout << "status.error_message: " << status.error_message()
+                  << std::endl;
+        std::cout << "falied to connect !!!" << std::endl;
+    }
 }
 
 void RpcClient::LoginRegister(monitor::proto::UserMessage& request,
-                        monitor::proto::UserResponseMessage& response) {
-    MprpcController controller;
-    // monitor::proto::MonitorInfo response;
-    user_stub_ptr_->LoginRegister(&controller, &request, &response, nullptr);
+                              monitor::proto::UserResponseMessage& response) {
+    ::grpc::ClientContext context;
+    ::grpc::Status status =
+        user_stub_ptr_->LoginRegister(&context, request, &response);
+    if (status.ok()) {
+    } else {
+        std::cout << status.error_details() << std::endl;
+        std::cout << "status.error_message: " << status.error_message()
+                  << std::endl;
+        std::cout << "falied to connect !!!" << std::endl;
+    }
 }
 }  // namespace monitor

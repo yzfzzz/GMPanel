@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "monitor_info.grpc.pb.h"
 #include "monitor_info.pb.h"
 #include "rpc_client.h"
 

@@ -12,19 +12,11 @@
 #include <vector>
 #include "client/rpc_client.h"
 #include "json.hpp"
-#include "mprpcapplication.h"
 #include "query_data.h"
 using namespace muduo;
 using namespace muduo::net;
 // using json = nlohmann::json;
-
-int h_argv;
-char** h_argc;
-
-// 模拟用户数据库
-std::unordered_map<std::string, std::string> users = {{"admin", "password123"},
-                                                      {"user", "123456"}};
-
+std::string server_address = "124.223.141.236:50051";
 void onRequest(const HttpRequest& req, HttpResponse* resp) {
     // 打印请求信息
     LOG_INFO << "Method: " << req.methodString() << " Path: " << req.path()
@@ -144,10 +136,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
     }
 }
 
-int main(int argv, char** argc) {
-    h_argc = argc;
-    h_argv = argv;
-    MprpcApplication::Init(h_argv, h_argc);
+int main() {
     EventLoop loop;
     HttpServer server(&loop, InetAddress("10.0.4.3", 80), "http_server");
     server.setHttpCallback(onRequest);
