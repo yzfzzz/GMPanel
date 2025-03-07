@@ -13,31 +13,52 @@
         }
 
         body {
-            min-height: 100vh;
+            /* min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #282a37;
             background-size: cover;
-            background-position: center;
+            background-position: center; */
+
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #282a37; /* 背景颜色作为备用 */
+            animation: slideshow  120s linear infinite; /* 动画总时长 120 秒，无限循环 */
+            background-size: cover; /* 背景图片覆盖整个页面 */
+            background-position: center; /* 背景图片居中 */
+            background-repeat: no-repeat; /* 背景图片不重复 */
+        }
+
+        @keyframes slideshow {
+            0% { background-image: url('./background_img/1.png'); }
+            25% { background-image: url('./background_img/1.png'); }
+            25.01% { background-image: url('./background_img/2.png'); }
+            50% { background-image: url('./background_img/2.png'); }
+            50.01% { background-image: url('./background_img/3.png'); }
+            75% { background-image: url('./background_img/3.png'); }
+            75.01% { background-image: url('./background_img/4.png'); }
+            100% { background-image: url('./background_img/4.png'); }
         }
 
         .wrapper {
             position: relative;
             width: 400px;
             height: 450px;
-            background: #3e404d;
+            background: rgba(62, 64, 77, 0.3); /* 使用 rgba 设置透明度 */
             border: 2px solid rgba(255, 255, 255, 0.5);
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px); /* 背景模糊效果 */
         }
 
         .wrapper:hover {
-            box-shadow: 0 0 40px rgba(255,255,255,0.5);
-            background: #46474e;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
+            background: rgba(70, 71, 78, 0.5); /* 悬停时透明度 */
         }
 
         .wrapper h1 {
