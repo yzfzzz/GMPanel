@@ -1,3 +1,4 @@
+find_package(fmt REQUIRED)
 set(SOURCES
    http_server.cpp
    ../tool/query_data.cpp
@@ -29,4 +30,5 @@ target_link_libraries(http_server
     muduo_base 
     pthread
     glog
+    fmt::fmt
 )

@@ -3,6 +3,8 @@
 #include <grpcpp/create_channel.h>
 #include <grpcpp/grpcpp.h>
 #include <memory>
+#include <vector>
+#include "json.hpp"
 #include "login_register.grpc.pb.h"
 #include "login_register.pb.h"
 #include "monitor_info.grpc.pb.h"
@@ -16,7 +18,7 @@ class RpcClient {
     ~RpcClient();
 
     void SetMonitorInfo(const monitor::proto::MonitorInfo& monitor_info);
-    void GetMonitorInfo(monitor::proto::QueryMessage& request,
+    bool GetMonitorInfo(monitor::proto::QueryMessage& request,
                         monitor::proto::QueryResults& response);
 
     void LoginRegister(monitor::proto::UserMessage& request,

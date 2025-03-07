@@ -26,17 +26,19 @@ void RpcClient::SetMonitorInfo(
     }
 }
 
-void RpcClient::GetMonitorInfo(monitor::proto::QueryMessage& request,
+bool RpcClient::GetMonitorInfo(monitor::proto::QueryMessage& request,
                                monitor::proto::QueryResults& response) {
     ::grpc::ClientContext context;
     ::grpc::Status status =
         stub_ptr_->GetMonitorInfo(&context, request, &response);
     if (status.ok()) {
+        return true;
     } else {
         std::cout << status.error_details() << std::endl;
         std::cout << "status.error_message: " << status.error_message()
                   << std::endl;
         std::cout << "falied to connect !!!" << std::endl;
+        return false;
     }
 }
 

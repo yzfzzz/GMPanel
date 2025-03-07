@@ -24,7 +24,9 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
 
     std::string path = req.path();
     if (path == "/" || path == "/index.html" || path == "/home.html" ||
-        path == "/register.html") {
+        path == "/register.html" || path == "/background_img/1.png" ||
+        path == "/background_img/2.png" || path == "/background_img/3.png" ||
+        path == "/background_img/4.png") {
         if (path == "/") {
             path = "/index.html";
         }
@@ -44,7 +46,6 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
         resp->setContentType("text/html");
         resp->setBody(content.str());
     } else if (path == "/data") {
-        monitor::RpcClient rpc_client;
         monitor::QueryData query_data;
 
         const std::string& request_query = req.query();
@@ -62,12 +63,19 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
         }
         std::cout << "account_num:" << account_num << std::endl;
         std::cout << "machine_name" << machine_name << std::endl;
-        if (query_data.queryDataInfo(account_num, machine_name, 5,
-                                     rpc_client)) {
+        LOG_INFO << "1";
+        if (!account_num.empty() &&
+            query_data.queryDataInfo(account_num, machine_name)) {
+            LOG_INFO << "2";
             resp->setStatusCode(HttpResponse::k200Ok);
             resp->setStatusMessage("OK");
             resp->setContentType("text/plain");
             resp->setBody(query_data.toJsonStr());
+        } else {
+            resp->setStatusCode(HttpResponse::k400BadRequest);
+            resp->setStatusMessage("Unauthorized");
+            resp->setContentType("text/plain");
+            resp->setBody("Invalid account num");
         }
 
     } else if (path == "/signup") {

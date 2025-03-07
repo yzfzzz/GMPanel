@@ -1,53 +1,60 @@
+#include "query_data.h"
 #include <algorithm>
 #include <iostream>
 #include "get_time.h"
 #include "log.h"
-#include "query_data.h"
 namespace monitor {
-bool QueryData::queryDataInfo(std::string account_num, std::string machine_name,
-                              int count, monitor::RpcClient& rpc_client) {
+bool QueryData::queryDataInfo(std::string account_num,
+                              std::string machine_name) {
+    std::cout << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__
+              << std::endl;
+    monitor::RpcClient rpc_client;
     this->account_num = account_num;
     this->machine_name = machine_name;
     GetCurTime cur_time;
-    // sql:
-    // select * from table_20241126 t WHERE user_id = (SELECT id FROM `user` u
-    // WHERE accountnum = 12345678)  order by time desc limit 10;
-    std::string table_name = "table_" + cur_time.get_year_mon_day();
-    std::string select_count = std::to_string(count);
-
-    std::string sql =
-        "select * from " + table_name + " WHERE user_id = " +
-        "(SELECT id FROM `user` u WHERE accountnum = " + account_num +
-        " and machine_name = '" + machine_name + "')" +
-        " order by time desc limit " + select_count;
-
-    std::cout << "queryDataInfo sql: " << sql << std::endl;
 
     ::monitor::proto::QueryMessage query_message;
-    query_message.set_sql(sql);
+    query_message.set_timeymd(cur_time.get_year_mon_day());
+    query_message.set_machine_name(machine_name);
+    query_message.set_accountnum(account_num);
+
     ::monitor::proto::QueryResults query_results;
     rpc_client.GetMonitorInfo(query_message, query_results);
-    if (query_results.query_data_size() == 0) {
-        return false;
+    std::cout << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__
+              << std::endl;
+
+    // TODO: 远端函数调用可能会失败，需要处理
+    ::monitor::proto::QueryResults* result = &query_results;
+
+    midinfo.machine_name = result->machine_name();
+    midinfo.hard_disk_total = result->hard_disk_total();
+    midinfo.hard_disk_used = result->hard_disk_used();
+    midinfo.hard_disk_used_percent = result->hard_disk_used_percent();
+    midinfo.cpu_percent = result->cpu_percent();
+    midinfo.cpu_logic_num = result->cpu_logic_num();
+    std::cout << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__
+              << "result->cpu_each_core_uesd: " << result->cpu_each_core_uesd()
+              << std::endl;
+    midinfo.cpu_each_core_uesd =
+        json2Vector<float>(result->cpu_each_core_uesd());
+    midinfo.mem_total = result->mem_total();
+    midinfo.mem_avail = result->mem_avail();
+    midinfo.os_name = result->os_name();
+    midinfo.os_startup_time = result->os_startup_time();
+    std::cout << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__
+              << std::endl;
+    midinfo.gpu_id = json2Vector<std::string>(result->gpu_id());
+    midinfo.gpu_name = json2Vector<std::string>(result->gpu_name());
+    midinfo.gpu_total_mem = json2Vector<int>(result->gpu_total_mem());
+    midinfo.gpu_used_mem = json2Vector<int>(result->gpu_used_mem());
+    midinfo.gpu_temperture = json2Vector<int>(result->gpu_temperture());
+    midinfo.gpu_mem_utilize = json2Vector<int>(result->gpu_mem_utilize());
+
+    for (int i = 0; i < result->net_rcv_rate_size(); i++) {
+        midinfo.net_rcv_rate_array.push_back(result->net_rcv_rate(i));
+        midinfo.net_send_rate_array.push_back(result->net_send_rate(i));
+        midinfo.timehms_array.push_back(result->timehms(i));
     }
-    MidInfo midinfo;
-    for (int i = 0; i < query_results.query_data_size(); i++) {
-        midinfo.gpu_num = query_results.query_data(i).gpu_num();
-        midinfo.gpu_name = query_results.query_data(i).gpu_name();
-        midinfo.gpu_used_mem = query_results.query_data(i).gpu_used_mem();
-        midinfo.gpu_total_mem = query_results.query_data(i).gpu_total_mem();
-        midinfo.gpu_avg_util = query_results.query_data(i).gpu_avg_util();
-        midinfo.cpu_load_avg_1 = query_results.query_data(i).cpu_load_avg_1();
-        midinfo.cpu_load_avg_3 = query_results.query_data(i).cpu_load_avg_3();
-        midinfo.cpu_load_avg_15 = query_results.query_data(i).cpu_load_avg_15();
-        midinfo.mem_used = query_results.query_data(i).mem_used();
-        midinfo.mem_total = query_results.query_data(i).mem_total();
-        midinfo.net_send_rate = query_results.query_data(i).net_send_rate();
-        midinfo.net_rcv_rate = query_results.query_data(i).net_rcv_rate();
-        midinfo.timehms = query_results.query_data(i).timehms();
-        query_result_array_.push_back(midinfo);
-    }
-    std::reverse(query_result_array_.begin(), query_result_array_.end());
     return true;
 }
 
