@@ -3,27 +3,31 @@ package monitor.proto;
 
 message QueryMessage
 {
-    string sql = 1;
-}
-
-message QueryData
-{
-    int32 gpu_num = 1;
-    string gpu_name = 2;
-    int32 gpu_used_mem = 3;
-    int32 gpu_total_mem = 4;
-    int32 gpu_avg_util = 5;
-    float cpu_load_avg_1 = 6;
-    float cpu_load_avg_3 = 7;
-    float cpu_load_avg_15 = 8;
-    float mem_used = 9;
-    float mem_total = 10;
-    float net_send_rate = 11;
-    float net_rcv_rate = 12;
-    string timehms = 13;
+    string timeymd = 1;
+    string machine_name = 2;
+    string accountnum = 3;
 }
 
 message QueryResults
 {
-    repeated QueryData query_data = 1;
+    string machine_name = 1;
+    repeated string timehms = 2;
+    float hard_disk_total = 3; 
+    float hard_disk_used = 4;
+    float hard_disk_used_percent = 5;
+    float cpu_percent = 6;
+    int32 cpu_logic_num = 7;
+    string cpu_each_core_uesd = 8;
+    float mem_total = 9;
+    float mem_avail = 10;
+    repeated float net_send_rate = 11;
+    repeated float net_rcv_rate = 12;
+    string os_name = 13;
+    string os_startup_time = 14;
+    string gpu_id = 15;
+    string gpu_name = 16;
+    string gpu_total_mem = 17;
+    string gpu_used_mem = 18;
+    string gpu_temperture = 19;
+    string gpu_mem_utilize = 20;
 }
