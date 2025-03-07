@@ -1,5 +1,6 @@
 #pragma once
 #include <grpcpp/support/status.h>
+#include <yaml-cpp/yaml.h>
 #include <cstdlib>
 #include <ctime>
 #include <memory>
@@ -8,6 +9,8 @@
 #include <thread>
 #include <unordered_map>
 #include "connection_pool.h"
+#include "json.hpp"
+#include "log.h"
 #include "midinfo.h"
 #include "monitor_info.grpc.pb.h"
 #include "monitor_info.pb.h"
@@ -37,29 +40,23 @@ class ServerManagerImpl : public monitor::proto::MonitorManager::Service {
 
     MidInfo parseInfos(monitor::proto::MonitorInfo& monitor_infos_);
 
-    ::monitor::proto::QueryResults queryDataInfo(
-        const ::monitor::proto::QueryMessage* request);
+    template <typename T>
+    std::string toJsonStr(std::vector<T>& v) {
+        nlohmann::json json_data = v;
+        return json_data.dump();
+    }
+
+    bool queryDataInfo(
+        const ::monitor::proto::QueryMessage* request,
+        ::monitor::proto::QueryResults* response);
 
    private:
+    YAML::Node sql_book;
     std::mutex create_mutex_;
     std::mutex set_mutex_;
     std::mutex get_mutex_;
     monitor::proto::MonitorInfo monitor_infos_;
     ConnectionPool* pool = ConnectionPool::getConnectPool();
-
-    std::string create_subsql_ =
-        std::string("(gpu_num int DEFAULT NULL,") +
-        "gpu_name varchar(100) DEFAULT NULL," +
-        "gpu_used_mem int DEFAULT NULL," + "gpu_total_mem int DEFAULT NULL," +
-        "gpu_avg_util int DEFAULT NULL," +
-        "cpu_load_avg_1 float DEFAULT NULL," +
-        "cpu_load_avg_3 float DEFAULT NULL," +
-        "cpu_load_avg_15 float DEFAULT NULL," + "mem_used float DEFAULT NULL," +
-        "mem_total float DEFAULT NULL," + "net_send_rate float DEFAULT NULL," +
-        "net_rcv_rate float DEFAULT NULL," + "user_id int NOT NULL," +
-        "time time NOT NULL," + "machine_name varchar(100) DEFAULT NULL" +
-        ") ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=" +
-        "utf8_general_ci COMMENT='create table according to date'";
 };
 
 class UserManagerImpl : public monitor::proto::UserManager::Service {
