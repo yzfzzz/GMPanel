@@ -1,10 +1,12 @@
 #pragma once
+#include <fmt/format.h>
 #include <grpc/grpc.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/grpcpp.h>
 #include <memory>
 #include <vector>
 #include "json.hpp"
+#include "log.h"
 #include "login_register.grpc.pb.h"
 #include "login_register.pb.h"
 #include "monitor_info.grpc.pb.h"

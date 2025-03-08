@@ -366,8 +366,7 @@ std::string UserManagerImpl::registerNewUser() {
                 sql = "INSERT INTO `user` (password,accountnum) values('" +
                       pwd_ + "','" + gen_number + "')";
                 if (conn_ptr->query(sql)) {
-                    response = "注册成功, 账号:" + gen_number +
-                               ", 点击确定自动跳转登录界面";
+                    response = gen_number;
                 }
             }
         }

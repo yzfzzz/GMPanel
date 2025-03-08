@@ -19,10 +19,10 @@ void RpcClient::SetMonitorInfo(
 
     if (status.ok()) {
     } else {
-        std::cout << status.error_details() << std::endl;
-        std::cout << "status.error_message: " << status.error_message()
-                  << std::endl;
-        std::cout << "falied to connect !!!" << std::endl;
+        LOG(ERROR) << fmt::format(
+            "failed to connect !!!status.error_message: {}, "
+            "status.error_details: {}",
+            status.error_message(), status.error_details());
     }
 }
 
