@@ -6,7 +6,7 @@ set(DATABASE_SRC
     src/mysql_conn.cpp
 )
 
-include_directories(${PROJECT_SOURCE_DIR}/database/include ${PROJECT_SOURCE_DIR}/tool) 
+include_directories(${PROJECT_SOURCE_DIR}/database/include ${PROJECT_SOURCE_DIR}/utils) 
 
 add_library(database ${DATABASE_SRC})
 

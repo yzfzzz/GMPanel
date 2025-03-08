@@ -2,12 +2,9 @@
 #include <algorithm>
 #include <iostream>
 #include "get_time.h"
-#include "log.h"
 namespace monitor {
 bool QueryData::queryDataInfo(std::string account_num,
                               std::string machine_name) {
-    std::cout << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__
-              << std::endl;
     monitor::RpcClient rpc_client;
     this->account_num = account_num;
     this->machine_name = machine_name;
@@ -20,8 +17,6 @@ bool QueryData::queryDataInfo(std::string account_num,
 
     ::monitor::proto::QueryResults query_results;
     rpc_client.GetMonitorInfo(query_message, query_results);
-    std::cout << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__
-              << std::endl;
 
     // TODO: 远端函数调用可能会失败，需要处理
     ::monitor::proto::QueryResults* result = &query_results;
@@ -32,17 +27,13 @@ bool QueryData::queryDataInfo(std::string account_num,
     midinfo.hard_disk_used_percent = result->hard_disk_used_percent();
     midinfo.cpu_percent = result->cpu_percent();
     midinfo.cpu_logic_num = result->cpu_logic_num();
-    std::cout << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__
-              << "result->cpu_each_core_uesd: " << result->cpu_each_core_uesd()
-              << std::endl;
     midinfo.cpu_each_core_uesd =
         json2Vector<float>(result->cpu_each_core_uesd());
     midinfo.mem_total = result->mem_total();
     midinfo.mem_avail = result->mem_avail();
     midinfo.os_name = result->os_name();
     midinfo.os_startup_time = result->os_startup_time();
-    std::cout << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__
-              << std::endl;
+
     midinfo.gpu_id = json2Vector<std::string>(result->gpu_id());
     midinfo.gpu_name = json2Vector<std::string>(result->gpu_name());
     midinfo.gpu_total_mem = json2Vector<int>(result->gpu_total_mem());

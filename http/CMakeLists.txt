@@ -1,7 +1,7 @@
 find_package(fmt REQUIRED)
 set(SOURCES
    http_server.cpp
-   ../tool/query_data.cpp
+   ../utils/query_data.cpp
 )
 
 find_package(Boost REQUIRED COMPONENTS system chrono date_time)
@@ -17,7 +17,7 @@ target_include_directories(http_server PUBLIC
   ${PROJECT_SOURCE_DIR}/rpc_manager
   ${PROJECT_SOURCE_DIR}/database/include
   ${PROJECT_SOURCE_DIR}/build/proto
-  ${PROJECT_SOURCE_DIR}/tool
+  ${PROJECT_SOURCE_DIR}/utils
 )
 
 target_link_libraries(http_server

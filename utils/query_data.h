@@ -6,6 +6,7 @@
 #include "client/rpc_client.h"
 #include "connection_pool.h"
 #include "json.hpp"
+#include "log.h"
 #include "midinfo.h"
 #include "mysql_conn.h"
 
@@ -19,8 +20,6 @@ class QueryData {
 
     template <typename T>
     std::vector<T> json2Vector(const std::string& json_str) {
-        std::cout << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__
-                  << std::endl;
         std::vector<T> array;
         if (!json_str.empty()) {
             nlohmann::json json_data = nlohmann::json::parse(json_str);
@@ -64,7 +63,7 @@ class QueryData {
         data["gpu_name"] = midinfo.gpu_name;
         data["gpu_id"] = midinfo.gpu_id;
         data["gpu_mem_utilize"] = midinfo.gpu_mem_utilize;
-        data["gpu_temperture"] = midinfo.gpu_temperture; 
+        data["gpu_temperture"] = midinfo.gpu_temperture;
         data["gpu_total_mem"] = midinfo.gpu_total_mem;
         data["gpu_used_mem"] = midinfo.gpu_used_mem;
         data["gpu_num"] = midinfo.gpu_num;
@@ -91,7 +90,7 @@ class UserManage {
             machine_name_array.push_back(machine_name);
             std::cout << "login machine name: " << machine_name << std::endl;
         }
-        std::cout << response_str << std::endl;
+        LOG(INFO) << "Login Response: " << response_str;
         if (response_str == "login successful") {
             // 登录成功
             data["state"] = response_str;
@@ -114,7 +113,7 @@ class UserManage {
         request.set_pwd(pwd);
         rpc_client.LoginRegister(request, response);
         response_str = response.response_str();
-        std::cout << response_str << std::endl;
+        LOG(INFO) << "SignUp Response: " << response_str;
         if (!response_str.empty()) {
             // 注册成功
             data["state"] = response_str;

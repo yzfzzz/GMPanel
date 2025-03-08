@@ -1,9 +1,9 @@
 #pragma once
 
 #include <glog/logging.h>
+#include <unistd.h>
 #include <iostream>
 #include <string>
-#include <unistd.h>
 namespace monitor {
 
 static void SetupLogging(const std::string& log_path) {
@@ -12,11 +12,18 @@ static void SetupLogging(const std::string& log_path) {
     FLAGS_log_dir = log_path;
 
     // 设置日志文件大小为10MB
-    FLAGS_max_log_size = 10 * 1024;  // 10MB
+    FLAGS_max_log_size = 10 * 1024;          // 10MB
+    FLAGS_stop_logging_if_full_disk = true;  // 磁盘满时停止记录
 
     // 禁用日志文件名中的机器名后缀
     FLAGS_alsologtostderr = true;
     FLAGS_logtostderr = false;
+
+    FLAGS_logtostderr = true;      // 所有日志输出到stderr
+    FLAGS_alsologtostderr = true;  // 同时输出到文件和stderr
+
+    google::SetLogDestination(google::GLOG_INFO, "./logs/INFO_");
+    google::SetLogDestination(google::GLOG_ERROR, "./logs/ERROR_");
 
     // 自动移除旧日志 day （apt旧版本没有）
     // google::EnableLogCleaner(3);

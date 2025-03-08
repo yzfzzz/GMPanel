@@ -8,7 +8,7 @@ set(SOURCES
 )
 
 link_directories(${PROJECT_SOURCE_DIR}/build/proto ${PROJECT_SOURCE_DIR}/database/lib)
-include_directories(${PROJECT_SOURCE_DIR}/build/proto ${PROJECT_SOURCE_DIR}/tool ${PROJECT_SOURCE_DIR}/database/include)
+include_directories(${PROJECT_SOURCE_DIR}/build/proto ${PROJECT_SOURCE_DIR}/utils ${PROJECT_SOURCE_DIR}/database/include)
 
 add_executable(server ${SOURCES})
 
