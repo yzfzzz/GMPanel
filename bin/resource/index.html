@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="./background_img/icon.ico">
     <title>Login Page</title>
     <style>
         * {
@@ -34,12 +35,12 @@
 
         @keyframes slideshow {
             0% { background-image: url('./background_img/1.png'); }
-            25% { background-image: url('./background_img/1.png'); }
-            25.01% { background-image: url('./background_img/2.png'); }
-            50% { background-image: url('./background_img/2.png'); }
-            50.01% { background-image: url('./background_img/3.png'); }
-            75% { background-image: url('./background_img/3.png'); }
-            75.01% { background-image: url('./background_img/4.png'); }
+            22% { background-image: url('./background_img/1.png'); }
+            25% { background-image: url('./background_img/2.png'); }
+            47% { background-image: url('./background_img/2.png'); }
+            50% { background-image: url('./background_img/3.png'); }
+            74% { background-image: url('./background_img/3.png'); }
+            77% { background-image: url('./background_img/4.png'); }
             100% { background-image: url('./background_img/4.png'); }
         }
 
@@ -47,7 +48,7 @@
             position: relative;
             width: 400px;
             height: 450px;
-            background: rgba(62, 64, 77, 0.3); /* 使用 rgba 设置透明度 */
+            background: rgba(62, 64, 77, 0.2); /* 使用 rgba 设置透明度 */
             border: 2px solid rgba(255, 255, 255, 0.5);
             border-radius: 20px;
             display: flex;
@@ -214,6 +215,17 @@
     </div>
 
     <script>
+
+        const hash = window.location.hash.substring(1); // 去掉#号
+
+        if (hash.length > 0) {
+            console.log("hello");
+            const urlParams = new URLSearchParams(hash);
+            const account_num = decodeURIComponent(urlParams.get('account_num')); // 解码消息
+            const password = decodeURIComponent(urlParams.get('password')); // 解码消息
+            document.getElementById("usernameInput").value = account_num;
+            document.getElementById("passwordInput").value = password;
+        }
         document.getElementById('loginForm').addEventListener('submit', function(event) {
             event.preventDefault(); // 阻止表单默认提交行为
 

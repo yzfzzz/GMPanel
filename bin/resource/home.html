@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GMPanel</title>
+    <link rel="icon" type="image/x-icon" href="./background_img/icon.ico">
     <link rel="stylesheet" href="http://at.alicdn.com/t/c/font_4835994_c6h6p88ea9j.css">
     <link rel="stylesheet" href="https://at.alicdn.com/t/c/font_3957413_8w2n19m9w1.css">
+    <title>GMPanel</title>
     <style>
         /* 全局样式 */
         body {
@@ -170,6 +171,7 @@
             top: 0; /* 表头固定 */
             z-index: 1; /* 确保表头在滚动时显示在最上层 */
         }
+        
 
         tr:hover {
             background-color: #f1f1f1;
@@ -181,6 +183,45 @@
         table th:nth-child(3) { width: 20%; }
         table th:nth-child(4) { width: 15%; }
         table th:nth-child(5) { width: 15%; }
+
+                /* 对话框样式 */
+                .dialog {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dialog-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .dialog-content button {
+            margin: 10px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #confirmBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #cancelBtn {
+            background-color: #f44336;
+            color: white;
+        }
 
         /* 响应式设计 */
         @media (max-width: 768px) {
@@ -227,7 +268,7 @@
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">GPU Monitor Panel</h1>
+    <h1 style="text-align: center;">😉GPU管理面板</h1>
     <!-- 下拉选项框 -->
     <div class="dropdown">
         <label for="gpuDropdown">选择机器名：</label>
@@ -302,8 +343,32 @@
             </table>
         </div>
 
+        <!-- 对话框 -->
+        <div id="customDialog" class="dialog">
+            <div class="dialog-content">
+                <p><span id="dialog_message">警告: 当前机器未运行!!!</span></p>
+                <button id="confirmBtn">确认</button>
+            </div>
+        </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+
+        // JavaScript 逻辑
+        const customDialog = document.getElementById("customDialog");
+        const confirmBtn = document.getElementById("confirmBtn");
+        // 确认按钮点击事件
+        confirmBtn.addEventListener("click", function () {
+            customDialog.style.display = "none"; // 隐藏对话框
+        });
+
+        // 点击对话框外部关闭对话框
+        customDialog.addEventListener("click", function (event) {
+            if (event.target === customDialog) {
+                customDialog.style.display = "none"; // 隐藏对话框
+            }
+        });
+
         // 数据修改接口
         const updateData = {
             // 更新用户信息
@@ -390,6 +455,10 @@
         // 定时获取服务器数据
         const fetchServerData = (endpoint = '/data') => {
                 const params = {account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value };
+                if(!document.getElementById('gpuDropdown').value)
+                {
+                    customDialog.style.display = "flex"; // 显示对话框
+                }
                 // 将参数拼接到URL中（如果需要）
                 const url = new URL(endpoint, window.location.origin);
                 Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
@@ -403,6 +472,10 @@
                 })
                 .then(data => {
                     console.log('Server data:', data); // 打印解析后的数据
+                    if(!data.os_name)
+                    {
+                        customDialog.style.display = "flex"; // 显示对话框
+                    }
                     // 在这里处理数据，例如更新页面内容
                     if (data.userInfo) {
                         updateData.setUserInfo(data.userInfo);
@@ -457,6 +530,7 @@
                 })
                 .catch(error => {
                     console.error('Error fetching server data:', error);
+
                 });
         };
 
@@ -559,5 +633,9 @@
 
         setInterval(fetchServerData, 5000,'/data');
     </script>
+     <!-- 添加跳转到GitHub的链接 -->
+     <footer style="text-align: center; margin-top: 20px;">
+        <a href="https://github.com/yzfzzz/GMPanel/tree/develop" target="_blank">📔欢迎访问GitHub仓库</a>
+    </footer>
 </body>
 </html>

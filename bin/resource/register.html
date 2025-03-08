@@ -14,20 +14,41 @@
         }
 
         body {
-            min-height: 100vh;
+            /* min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #282a37;
             background-size: cover;
-            background-position: center;
+            background-position: center; */
+
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #282a37; /* 背景颜色作为备用 */
+            animation: slideshow  120s linear infinite; /* 动画总时长 120 秒，无限循环 */
+            background-size: cover; /* 背景图片覆盖整个页面 */
+            background-position: center; /* 背景图片居中 */
+            background-repeat: no-repeat; /* 背景图片不重复 */
+        }
+
+        @keyframes slideshow {
+            0% { background-image: url('./background_img/1.png'); }
+            22% { background-image: url('./background_img/1.png'); }
+            25% { background-image: url('./background_img/2.png'); }
+            47% { background-image: url('./background_img/2.png'); }
+            50% { background-image: url('./background_img/3.png'); }
+            74% { background-image: url('./background_img/3.png'); }
+            77% { background-image: url('./background_img/4.png'); }
+            100% { background-image: url('./background_img/4.png'); }
         }
 
         .wrapper {
             position: relative;
             width: 400px;
             height: 450px;
-            background: #3e404d;
+            background: rgba(62, 64, 77, 0.2);;
             border: 2px solid rgba(255, 255, 255, 0.5);
             border-radius: 20px;
             display: flex;
@@ -118,6 +139,45 @@
         .wrapper .login-link a:hover {
             text-decoration: underline;
         }
+
+        /* 对话框样式 */
+        .dialog {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dialog-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .dialog-content button {
+            margin: 10px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #confirmBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #cancelBtn {
+            background-color: #f44336;
+            color: white;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
@@ -145,13 +205,49 @@
         <div id="errorMessage" class="error-message"></div>
     </div>
 
+    <!-- 对话框 -->
+    <div id="customDialog" class="dialog">
+        <div class="dialog-content">
+            <p><span id="dialog_message">注册成功！是否跳转到登录页面？</span></p>
+            <button id="confirmBtn">确认</button>
+            <button id="cancelBtn">取消</button>
+        </div>
+    </div>
+
     <script>
-        // JavaScript 逻辑
+        var params;
+        var account_num;
         document.getElementById('signupForm').addEventListener('submit', function(event) {
             event.preventDefault(); // 阻止表单默认提交行为
 
+            // JavaScript 逻辑
+            const signupForm = document.getElementById("signupForm");
+            const customDialog = document.getElementById("customDialog");
+            const confirmBtn = document.getElementById("confirmBtn");
+            const cancelBtn = document.getElementById("cancelBtn");
+            // 确认按钮点击事件
+            confirmBtn.addEventListener("click", function () {
+                setTimeout(function() {
+                    const message = "account_num="+account_num+"&"+params;
+                    const encodedMessage = encodeURIComponent(message); // 编码消息
+                    window.location.href = `index.html#${message}`;
+                    }, 100); // 1000 毫秒 = 1 秒
+            });
+
+            // 取消按钮点击事件
+            cancelBtn.addEventListener("click", function () {
+                customDialog.style.display = "none"; // 隐藏对话框
+            });
+
+            // 点击对话框外部关闭对话框
+            customDialog.addEventListener("click", function (event) {
+                if (event.target === customDialog) {
+                    customDialog.style.display = "none"; // 隐藏对话框
+                }
+            });
+
             const formData = new FormData(this);
-            const params = new URLSearchParams(formData).toString();
+            params = new URLSearchParams(formData).toString();
 
             fetch(`/signup?${params}`, {
                 method: 'GET',
@@ -167,10 +263,9 @@
             })
             .then(data => {
                 if (data.state) {
-                    alert(data.state);
-                    setTimeout(function() {
-                        window.location.href = 'index.html';
-                    }, 2000); // 5000 毫秒 = 5 秒
+                    account_num = data.state;
+                    document.getElementById('dialog_message').textContent = "注册成功! 账号: "+data.state+", 是否直接登录?"
+                    customDialog.style.display = "flex"; // 显示对话框
                 } else {
                     document.getElementById('errorMessage').textContent = data.state;
                 }

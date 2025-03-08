@@ -1,3 +1,5 @@
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <muduo/base/Logging.h>
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/TcpServer.h>
@@ -12,6 +14,7 @@
 #include <vector>
 #include "client/rpc_client.h"
 #include "json.hpp"
+#include "log.h"
 #include "query_data.h"
 using namespace muduo;
 using namespace muduo::net;
@@ -19,14 +22,14 @@ using namespace muduo::net;
 std::string server_address = "124.223.141.236:50051";
 void onRequest(const HttpRequest& req, HttpResponse* resp) {
     // 打印请求信息
-    LOG_INFO << "Method: " << req.methodString() << " Path: " << req.path()
-             << " Version: " << req.getVersion();
+    LOG(INFO) << "Method: " << req.methodString() << " Path: " << req.path()
+              << " Version: " << req.getVersion();
 
     std::string path = req.path();
     if (path == "/" || path == "/index.html" || path == "/home.html" ||
         path == "/register.html" || path == "/background_img/1.png" ||
         path == "/background_img/2.png" || path == "/background_img/3.png" ||
-        path == "/background_img/4.png") {
+        path == "/background_img/4.png" || path == "/background_img/icon.ico") {
         if (path == "/") {
             path = "/index.html";
         }
@@ -61,9 +64,9 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
             account_num = matches[1];
             machine_name = matches[2];
         }
-        std::cout << "account_num:" << account_num << std::endl;
-        std::cout << "machine_name" << machine_name << std::endl;
-        LOG_INFO << "1";
+        LOG(INFO) << fmt::format("request: account_num:{} machine_name:{}",
+                                 account_num, machine_name);
+
         if (!account_num.empty() &&
             query_data.queryDataInfo(account_num, machine_name)) {
             LOG_INFO << "2";
@@ -77,7 +80,6 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
             resp->setContentType("text/plain");
             resp->setBody("Invalid account num");
         }
-
     } else if (path == "/signup") {
         const std::string& request_query = req.query();
         // 定义正则表达式
