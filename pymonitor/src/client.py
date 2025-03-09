@@ -18,6 +18,7 @@ import os
 import platform
 from pynvml import *
 import time
+import logging
 
 class Monitor:
     def __init__(self):
@@ -43,7 +44,7 @@ class Monitor:
             "cpu_percent": cpu_percent,
             "cpu_count": cpu_count,
             "cpu_freq": cpu_freq,
-            "cpu_each_core_uesd": cpu_each_core_uesd
+            "cpu_each_core_uesd": list(map(lambda x: round(x, 2), cpu_each_core_uesd))
         }
 
     def get_memory_info(self):
@@ -84,7 +85,7 @@ class Monitor:
                 mem_info = nvmlDeviceGetMemoryInfo(handle)
                 util = nvmlDeviceGetUtilizationRates(handle)
                 gpu_info.append({
-                    "gpu_id": i,
+                    "gpu_id": str(i),
                     "gpu_name": nvmlDeviceGetName(handle),
                     "total_memory": round(self.convert_bytes(mem_info.total, "MB"), 2),  # 转换为 MB
                     "used_memory": round(self.convert_bytes(mem_info.used, "MB"), 2),  # 转换为 MB
@@ -109,7 +110,7 @@ class Monitor:
 
     def get_time(self):
         return{
-            "timeymd": time.strftime("%Y-%m-%d",time.localtime()),
+            "timeymd": time.strftime("%Y%m%d",time.localtime()),
             "timehms": time.strftime("%H:%M:%S",time.localtime()),
         }
 
@@ -128,13 +129,14 @@ class Monitor:
 
 class RpcClient:
     def __init__(self, address):
-        self.channel = grpc.insecure_channel(address)
+        # 设置连接超时为10s
+        self.channel = grpc.insecure_channel(address, options=[('grpc.connect_timeout_ms', 10000)])
         self.monitor_stub = monitor_info_pb2_grpc.MonitorManagerStub(self.channel)
         self.user_stub = monitor_info_pb2_grpc.UserManagerStub(self.channel)
-
+        self.monitor = Monitor()
 
     def get_monitor_info(self, sys_info):
-        print("run")
+
         monitor_info = monitor_info_pb2.MonitorInfo(
             name="MyMachine",
             hard_disk=monitor_info_pb2.hard__disk__pb2.HardDisk(total=sys_info['disk_info']['total_disk'], used=sys_info['disk_info']['used_disk'],
@@ -144,13 +146,13 @@ class RpcClient:
                                               each_core_utilization_rate=sys_info['cpu_info']['cpu_each_core_uesd']),
             mem_info=monitor_info_pb2.mem__info__pb2.MemInfo(total=sys_info['memory_info']['total_memory'], avail=sys_info['memory_info']['available_memory']),
             net_info=monitor_info_pb2.net__info__pb2.NetInfo(send_rate=sys_info['network_info']['bytes_sent'], rcv_rate=sys_info['network_info']['bytes_recv']),
-            accountnum="user123",
+            accountnum="168925",
             time=monitor_info_pb2.time__pb2.Time(timeymd=sys_info['time']['timeymd'] , timehms = sys_info['time']['timehms']),
             os=monitor_info_pb2.os__pb2.OS(os_name=sys_info['os_info']['system'], os_startup_time=sys_info['os_info']['boot_time']),
-            machine_name="MyMachine"
+            machine_name="1-xiaoxin"
         )
         for gpu_info in sys_info['gpu_info']:
-            gpu = monitor_info_pb2.gpu__info__pb2.GpuInfo(gpu_name=gpu_info['gpu_name'], gpu_mem_total=int(gpu_info['total_memory']),
+            gpu = monitor_info_pb2.gpu__info__pb2.GpuInfo(id = gpu_info['gpu_id'],gpu_name=gpu_info['gpu_name'], gpu_mem_total=int(gpu_info['total_memory']),
                                                 gpu_mem_used = int(gpu_info['used_memory']),temperture = gpu_info['temperature'],
                                                 gpu_utilize = gpu_info['memory_utilization'] )
             monitor_info.gpu_info.append(gpu)
@@ -158,39 +160,28 @@ class RpcClient:
         return monitor_info
 
     def SetMonitorInfo(self):
-        m = Monitor()
-        self.monitor_stub.SetMonitorInfo(self.get_monitor_info(m.get_system_info()))
-
-
-
-
-# def run():
-#     # 创建 gRPC 通道
-#     channel = grpc.insecure_channel('124.223.141.236:50051')
-#
-#     # 创建客户端
-#     monitor_stub = monitor_info_pb2_grpc.MonitorManagerStub(channel)
-#     user_stub = monitor_info_pb2_grpc.UserManagerStub(channel)
-#
-#     # 调用 SetMonitorInfo
-#     # response = monitor_stub.SetMonitorInfo(monitor_info)
-#     # print("SetMonitorInfo response:", response)
-#
-#     # 调用 GetMonitorInfo
-#     # query_message = monitor_info_pb2.QueryMessage(query="Get all info")
-#     # query_results = monitor_stub.GetMonitorInfo(query_message)
-#     # print("GetMonitorInfo response:", query_results)
-#
-#     # 调用 UserManager 的 LoginRegister
-#     user_message = login_register_pb2.UserMessage(account_num="168925", pwd="123456")
-#     user_response = user_stub.LoginRegister(user_message)
-#     print("LoginRegister response:", user_response.machine_name_array[1])
-
+        res = self.monitor_stub.SetMonitorInfo(self.get_monitor_info(self.monitor.get_system_info()))
+        return res
 
 if __name__ == '__main__':
-    m = Monitor()
-    info = m.get_system_info()
-    print(info)
+    # 配置日志
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        filename='pymonitor.log'
+    )
+    logging.info("This is python client of gmpanel")
     rpc_client = RpcClient("124.223.141.236:50051")
-    rpc_client.SetMonitorInfo()
+    while True:
+        try:
+            res = rpc_client.SetMonitorInfo()
+            logging.info("Successful call function!!!")
+
+        except grpc.RpcError as e:
+            logging.error(f"Error fetching GPU info: {e}")
+            #  长时间无响应时，服务器会进行四次挥手，TCP断开，因此需要重新建立channel进行重连
+            rpc_client = None
+            rpc_client = RpcClient("124.223.141.236:50051")
+        time.sleep(5)
+
 
