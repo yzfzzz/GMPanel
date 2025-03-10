@@ -1,4 +1,5 @@
 find_package(fmt REQUIRED)
+find_package(yaml-cpp REQUIRED)
 set(SOURCES
    http_server.cpp
    ../utils/query_data.cpp
@@ -31,4 +32,5 @@ target_link_libraries(http_server
     pthread
     glog
     fmt::fmt
+    yaml-cpp
 )

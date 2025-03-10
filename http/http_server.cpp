@@ -6,11 +6,13 @@
 #include <muduo/net/http/HttpRequest.h>
 #include <muduo/net/http/HttpResponse.h>
 #include <muduo/net/http/HttpServer.h>
+#include <yaml-cpp/yaml.h>
 #include <fstream>
 #include <iostream>
 #include <regex>
 #include <sstream>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include "client/rpc_client.h"
 #include "json.hpp"
@@ -18,18 +20,30 @@
 #include "query_data.h"
 using namespace muduo;
 using namespace muduo::net;
-// using json = nlohmann::json;
 std::string server_address = "124.223.141.236:50051";
+std::unordered_set<std::string> paths;
+
+// 新增函数，用于检测是否是长连接
+bool isKeepAlive(const HttpRequest& req) {
+    const std::string& connectionHeader = req.getHeader("Connection");
+    if (req.getVersion() == HttpRequest::kHttp10) {
+        // HTTP/1.0 默认是短连接，除非明确指定 Keep-Alive
+        return connectionHeader == "Keep-Alive";
+    } else {
+        // HTTP/1.1 及以上默认是长连接，除非明确指定 close
+        return connectionHeader != "close";
+    }
+}
+
 void onRequest(const HttpRequest& req, HttpResponse* resp) {
+    bool keepAlive = isKeepAlive(req);
+
     // 打印请求信息
     LOG(INFO) << "Method: " << req.methodString() << " Path: " << req.path()
               << " Version: " << req.getVersion();
 
     std::string path = req.path();
-    if (path == "/" || path == "/index.html" || path == "/home.html" ||
-        path == "/register.html" || path == "/background_img/1.png" ||
-        path == "/background_img/2.png" || path == "/background_img/3.png" ||
-        path == "/background_img/4.png" || path == "/background_img/icon.ico") {
+    if (paths.find(path) != paths.end()) {
         if (path == "/") {
             path = "/index.html";
         }
@@ -48,19 +62,16 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
         resp->setStatusMessage("OK");
         resp->setContentType("text/html");
         resp->setBody(content.str());
+        if (!keepAlive) {
+            resp->setCloseConnection(true);
+        }
     } else if (path == "/data") {
         monitor::QueryData query_data;
-
         const std::string& request_query = req.query();
-        // 定义正则表达式
         std::regex pattern(R"(\?account_num=([^&]+)&machine_name=([^&]+))");
-        // 用于存储匹配结果
         std::smatch matches;
-        // 解析表单数据（格式为 username=admin&password=password123）
         std::string account_num, machine_name;
-        // 进行匹配
         if (std::regex_match(request_query, matches, pattern)) {
-            // 提取捕获组
             account_num = matches[1];
             machine_name = matches[2];
         }
@@ -82,15 +93,10 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
         }
     } else if (path == "/signup") {
         const std::string& request_query = req.query();
-        // 定义正则表达式
         std::regex pattern(R"(\?email=([^&]+)&password=([^&]+))");
-        // 用于存储匹配结果
         std::smatch matches;
-        // 解析表单数据（格式为 username=admin&password=password123）
         std::string email, password;
-        // 进行匹配
         if (std::regex_match(request_query, matches, pattern)) {
-            // 提取捕获组
             email = matches[1];
             password = matches[2];
         }
@@ -144,9 +150,18 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
         resp->setContentType("text/html");
         resp->setBody("<h1>404 Not Found</h1>");
     }
+    // 根据是否是长连接设置响应头
+    if (!keepAlive) {
+        resp->setCloseConnection(true);
+    }
 }
 
 int main() {
+    YAML::Node config = YAML::LoadFile("http_server_path.yaml");
+    for (auto c : config["file"]) {
+        paths.insert(c.as<std::string>());
+    }
+    
     EventLoop loop;
     HttpServer server(&loop, InetAddress("10.0.4.3", 80), "http_server");
     server.setHttpCallback(onRequest);
