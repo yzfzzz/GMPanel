@@ -21,7 +21,7 @@
 using namespace muduo;
 using namespace muduo::net;
 std::string server_address = "124.223.141.236:50051";
-std::unordered_set<std::string> paths;
+std::unordered_map<std::string, std::string> files_cache;
 
 // 新增函数，用于检测是否是长连接
 bool isKeepAlive(const HttpRequest& req) {
@@ -43,25 +43,12 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
               << " Version: " << req.getVersion();
 
     std::string path = req.path();
-    if (paths.find(path) != paths.end()) {
-        if (path == "/") {
-            path = "/index.html";
-        }
-        std::ifstream file("./resource" + path,
-                           std::ios::in | std::ios::binary);
-        if (!file) {
-            resp->setStatusCode(HttpResponse::k404NotFound);
-            resp->setStatusMessage("Not Found");
-            resp->setBody("File not found");
-            return;
-        }
-        std::ostringstream content;
-        content << file.rdbuf();
-        file.close();
+    if (files_cache.find(path) != files_cache.end()) {
         resp->setStatusCode(HttpResponse::k200Ok);
+        resp->addHeader("Cache-Control", "public, max-age=60, immutable");
         resp->setStatusMessage("OK");
         resp->setContentType("text/html");
-        resp->setBody(content.str());
+        resp->setBody(files_cache.find(path)->second);
         if (!keepAlive) {
             resp->setCloseConnection(true);
         }
@@ -159,9 +146,21 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
 int main() {
     YAML::Node config = YAML::LoadFile("http_server_path.yaml");
     for (auto c : config["file"]) {
-        paths.insert(c.as<std::string>());
+        std::string path = c.as<std::string>();
+        if (path == "/") {
+            path = "/index.html";
+        }
+        std::ifstream file("./resource" + path,
+                           std::ios::in | std::ios::binary);
+        if (!file) {
+            return -1;
+        }
+        std::ostringstream content;
+        content << file.rdbuf();
+        file.close();
+        files_cache[c.as<std::string>()] = content.str();
     }
-    
+
     EventLoop loop;
     HttpServer server(&loop, InetAddress("10.0.4.3", 80), "http_server");
     server.setHttpCallback(onRequest);
