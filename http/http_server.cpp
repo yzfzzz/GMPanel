@@ -1,3 +1,9 @@
+#define MPRPC 1
+#define GRPC 2
+#define RPC_TYPE_DEFINE MPRPC
+#if RPC_TYPE_DEFINE == MPRPC
+#include "mprpcapplication.h"
+#endif
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <muduo/base/Logging.h>
@@ -143,7 +149,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
     }
 }
 
-int main() {
+void yamlInit() {
     YAML::Node config = YAML::LoadFile("http_server_path.yaml");
     for (auto c : config["file"]) {
         std::string path = c.as<std::string>();
@@ -153,17 +159,29 @@ int main() {
         std::ifstream file("./resource" + path,
                            std::ios::in | std::ios::binary);
         if (!file) {
-            return -1;
+            return;
         }
         std::ostringstream content;
         content << file.rdbuf();
         file.close();
         files_cache[c.as<std::string>()] = content.str();
     }
+}
 
+void serverInit() {
+    yamlInit(); 
     EventLoop loop;
     HttpServer server(&loop, InetAddress("10.0.4.3", 80), "http_server");
     server.setHttpCallback(onRequest);
     server.start();
     loop.loop();
 }
+
+#if RPC_TYPE_DEFINE == MPRPC
+int main(int argv, char** argc) {
+    MprpcApplication::Init(argv, argc);
+    serverInit();
+}
+#elif RPC_TYPE_DEFINE == GRPC
+int main() { serverInit(); }
+#endif

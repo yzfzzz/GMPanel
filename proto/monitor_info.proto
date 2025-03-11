@@ -14,7 +14,8 @@ import "login_register.proto";
 import "hard_disk.proto";
 import "os.proto";
 
-option cc_generic_services = false;
+// 使用mprpc需要true，使用grpc需要false
+option cc_generic_services = true;
 
 
 

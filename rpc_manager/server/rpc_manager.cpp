@@ -36,18 +36,43 @@ ServerManagerImpl::~ServerManagerImpl() {}
 UserManagerImpl ::UserManagerImpl() {}
 UserManagerImpl ::~UserManagerImpl() {}
 
+#if RPC_TYPE_DEFINE == MPRPC
+void ServerManagerImpl::SetMonitorInfo(
+    ::google::protobuf::RpcController* controller,
+    const ::monitor::proto::MonitorInfo* request,
+    ::google::protobuf::Empty* response, ::google::protobuf::Closure* done) {
+    std::lock_guard<std::mutex> lock(set_mutex_);
+    LOG(INFO) << "RPC Call: ServerManagerImpl::SetMonitorInfo";
+    monitor_infos_.Clear();
+    monitor_infos_ = *request;
+    insertOneInfo(monitor_infos_);
+    done->Run();
+}
+#elif RPC_TYPE_DEFINE == GRPC
 ::grpc::Status ServerManagerImpl::SetMonitorInfo(
     ::grpc::ServerContext* context,
     const ::monitor::proto::MonitorInfo* request,
     ::google::protobuf::Empty* response) {
     std::lock_guard<std::mutex> lock(set_mutex_);
-    LOG(INFO) << "RPC Call: ServerManagerImpl::SetMonitorInfo";
     monitor_infos_.Clear();
     monitor_infos_ = *request;
     insertOneInfo(monitor_infos_);
     return grpc::Status::OK;
 }
 
+#endif
+#if RPC_TYPE_DEFINE == MPRPC
+void ServerManagerImpl::GetMonitorInfo(
+    ::google::protobuf::RpcController* controller,
+    const ::monitor::proto::QueryMessage* request,
+    ::monitor::proto::QueryResults* response,
+    ::google::protobuf::Closure* done) {
+    std::lock_guard<std::mutex> lock(get_mutex_);
+    // LOG(INFO) << "RPC Call: ServerManagerImpl::GetMonitorInfo";
+    queryDataInfo(request, response);
+    done->Run();
+}
+#elif RPC_TYPE_DEFINE == GRPC
 ::grpc::Status ServerManagerImpl::GetMonitorInfo(
     ::grpc::ServerContext* context,
     const ::monitor::proto::QueryMessage* request,
@@ -55,13 +80,13 @@ UserManagerImpl ::~UserManagerImpl() {}
     std::lock_guard<std::mutex> lock(get_mutex_);
 
     if (queryDataInfo(request, response)) {
-        LOG(INFO) << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__;
         return ::grpc::Status::OK;
     } else {
-        LOG(INFO) << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__;
         return ::grpc::Status(::grpc::StatusCode::UNKNOWN, "Error message");
     }
 }
+
+#endif
 
 bool ServerManagerImpl::queryDataInfo(
     const ::monitor::proto::QueryMessage* request,
@@ -287,7 +312,26 @@ bool ServerManagerImpl::isTableExist(std::string table_name,
     }
     return false;
 }
-
+#if RPC_TYPE_DEFINE == MPRPC
+void UserManagerImpl::LoginRegister(
+    ::google::protobuf::RpcController* controller,
+    const ::monitor::proto::UserMessage* request,
+    ::monitor::proto::UserResponseMessage* response,
+    ::google::protobuf::Closure* done) {
+    LOG(INFO) << "RPC Call: UserManagerImpl::LoginRegister";
+    account_num_ = request->account_num();
+    pwd_ = request->pwd();
+    if (account_num_.empty()) {
+        response->set_response_str(registerNewUser());
+    } else {
+        response->set_response_str(verifyLoginInformation());
+    }
+    queryUserMachineName(response);
+    account_num_.clear();
+    pwd_.clear();
+    done->Run();
+}
+#elif RPC_TYPE_DEFINE == GRPC
 ::grpc::Status UserManagerImpl::LoginRegister(
     ::grpc::ServerContext* context,
     const ::monitor::proto::UserMessage* request,
@@ -305,6 +349,7 @@ bool ServerManagerImpl::isTableExist(std::string table_name,
     pwd_.clear();
     return grpc::Status::OK;
 }
+#endif
 
 std::string UserManagerImpl::verifyLoginInformation() {
     std::string response;

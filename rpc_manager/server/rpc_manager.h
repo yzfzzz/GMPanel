@@ -1,5 +1,7 @@
 #pragma once
-#include <grpcpp/support/status.h>
+#define MPRPC 1
+#define GRPC 2
+#define RPC_TYPE_DEFINE MPRPC
 #include <yaml-cpp/yaml.h>
 #include <cstdlib>
 #include <ctime>
@@ -12,16 +14,38 @@
 #include "json.hpp"
 #include "log.h"
 #include "midinfo.h"
+
+#if RPC_TYPE_DEFINE == MPRPC
+#include "mprpcapplication.h"
+#include "rpcprovider.h"
+#elif RPC_TYPE_DEFINE == GRPC
+#include <grpcpp/support/status.h>
 #include "monitor_info.grpc.pb.h"
+#endif
+
 #include "monitor_info.pb.h"
 #include "mysql_conn.h"
 namespace monitor {
-
-class ServerManagerImpl : public monitor::proto::MonitorManager::Service {
+#if RPC_TYPE_DEFINE == MPRPC
+class ServerManagerImpl : public monitor::proto::MonitorManager
+#elif RPC_TYPE_DEFINE == GRPC
+class ServerManagerImpl : public monitor::proto::MonitorManager::Service
+#endif
+{
    public:
     ServerManagerImpl();
     virtual ~ServerManagerImpl();
 
+#if RPC_TYPE_DEFINE == MPRPC
+    void SetMonitorInfo(::google::protobuf::RpcController* controller,
+                        const ::monitor::proto::MonitorInfo* request,
+                        ::google::protobuf::Empty* response,
+                        ::google::protobuf::Closure* done);
+    void GetMonitorInfo(::google::protobuf::RpcController* controller,
+                        const ::monitor::proto::QueryMessage* request,
+                        ::monitor::proto::QueryResults* response,
+                        ::google::protobuf::Closure* done);
+#elif RPC_TYPE_DEFINE == GRPC
     ::grpc::Status SetMonitorInfo(::grpc::ServerContext* context,
                                   const ::monitor::proto::MonitorInfo* request,
                                   ::google::protobuf::Empty* response);
@@ -29,6 +53,7 @@ class ServerManagerImpl : public monitor::proto::MonitorManager::Service {
     ::grpc::Status GetMonitorInfo(::grpc::ServerContext* context,
                                   const ::monitor::proto::QueryMessage* request,
                                   ::monitor::proto::QueryResults* response);
+#endif
 
     // 插入一条数据
     bool insertOneInfo(monitor::proto::MonitorInfo& monitor_infos_);
@@ -46,9 +71,8 @@ class ServerManagerImpl : public monitor::proto::MonitorManager::Service {
         return json_data.dump();
     }
 
-    bool queryDataInfo(
-        const ::monitor::proto::QueryMessage* request,
-        ::monitor::proto::QueryResults* response);
+    bool queryDataInfo(const ::monitor::proto::QueryMessage* request,
+                       ::monitor::proto::QueryResults* response);
 
    private:
     YAML::Node sql_book;
@@ -59,15 +83,28 @@ class ServerManagerImpl : public monitor::proto::MonitorManager::Service {
     ConnectionPool* pool = ConnectionPool::getConnectPool();
 };
 
-class UserManagerImpl : public monitor::proto::UserManager::Service {
+#if RPC_TYPE_DEFINE == MPRPC
+class UserManagerImpl : public monitor::proto::UserManager
+#elif RPC_TYPE_DEFINE == GRPC
+class UserManagerImpl : public monitor::proto::UserManager::Service
+#endif
+{
    public:
     UserManagerImpl();
     virtual ~UserManagerImpl();
 
+#if RPC_TYPE_DEFINE == MPRPC
+    void LoginRegister(::google::protobuf::RpcController* controller,
+                       const ::monitor::proto::UserMessage* request,
+                       ::monitor::proto::UserResponseMessage* response,
+                       ::google::protobuf::Closure* done);
+#elif RPC_TYPE_DEFINE == GRPC
     ::grpc::Status LoginRegister(
         ::grpc::ServerContext* context,
         const ::monitor::proto::UserMessage* request,
         ::monitor::proto::UserResponseMessage* response);
+
+#endif
 
     std::string verifyLoginInformation();
     std::string registerNewUser();
