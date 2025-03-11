@@ -26,4 +26,4 @@ fi
 mkdir build
 cd build
 cmake ..
-make -j8
+make -j2

@@ -2,7 +2,7 @@
     "ip":"host.docker.internal",
     "port":3306,
     "userName":"debian-sys-maint",
-    "password":"SQ0CTalwPPoAhCnh",
+    "password":"uUakoE1X8Ei6TqLJ",
     "dbName":"serverMonitor",
     "minSize":100,
     "maxSize":1024,
