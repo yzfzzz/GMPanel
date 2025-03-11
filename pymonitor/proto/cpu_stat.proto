@@ -1,0 +1,10 @@
+syntax = "proto3";
+package monitor.proto;
+
+message CpuStat{
+  float cpu_percent = 2;
+  int32 cpu_logic_num = 10;
+  int32 cpu_physical_core_num = 11;
+  float cpu_used_percent = 12;
+  repeated float  each_core_utilization_rate = 13;
+  }

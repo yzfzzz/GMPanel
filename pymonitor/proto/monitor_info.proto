@@ -1,0 +1,42 @@
+syntax = "proto3";
+package monitor.proto;
+
+import "google/protobuf/empty.proto";
+import "net_info.proto";
+import "mem_info.proto";
+import "cpu_stat.proto";
+import "cpu_softirq.proto";
+import "cpu_load.proto";
+import "gpu_info.proto";
+import "time.proto";
+import "query.proto";
+import "login_register.proto";
+import "hard_disk.proto";
+import "os.proto";
+
+option cc_generic_services = false;
+
+message MonitorInfo {
+    string name = 1;
+    OS os = 2;
+    HardDisk hard_disk = 3;
+    CpuLoad cpu_load = 4;
+    CpuStat cpu_stat = 5;
+    MemInfo mem_info = 6;
+    NetInfo net_info = 7;
+    repeated GpuInfo gpu_info = 8;
+    string accountnum = 9;
+    Time time = 10;
+    string machine_name = 11;
+    
+}
+
+service MonitorManager {
+    rpc SetMonitorInfo(MonitorInfo) returns(google.protobuf.Empty) {}
+
+    rpc GetMonitorInfo(QueryMessage) returns(QueryResults) {}
+}
+
+service UserManager{
+    rpc LoginRegister(UserMessage) returns(UserResponseMessage) {}
+}

@@ -1,0 +1,40 @@
+create_table_sql: (user_id int(11) NOT NULL COMMENT '用户的id',
+  machine_name varchar(20) NOT NULL COMMENT '机器名',
+  timehms time NOT NULL COMMENT '时间',
+  hard_disk_total float DEFAULT NULL COMMENT '硬盘总大小',
+  hard_disk_used float DEFAULT NULL COMMENT '硬盘已使用大小',
+  hard_disk_used_percent float DEFAULT NULL COMMENT '硬盘使用百分比',
+  cpu_percent float DEFAULT NULL COMMENT 'cpu使用百分比',
+  cpu_logic_num int(11) DEFAULT NULL COMMENT 'cpu逻辑核心数量',
+  cpu_each_core_uesd json DEFAULT NULL COMMENT 'cpu每个逻辑核心负载，该字段是一个数组',
+  mem_total float DEFAULT NULL COMMENT '内存总大小',
+  mem_avail float DEFAULT NULL COMMENT '空闲的内存大小',
+  net_send_rate float DEFAULT NULL COMMENT '发送字节大小',
+  net_rcv_rate float DEFAULT NULL COMMENT '接收字节大小',
+  os_name varchar(50) DEFAULT NULL COMMENT '操作系统名称',
+  os_startup_time datetime DEFAULT NULL COMMENT '服务器启动时间',
+  gpu_id json DEFAULT NULL COMMENT '显卡的id序号，string数组',
+  gpu_name json DEFAULT NULL COMMENT '显卡名称，string数组',
+  gpu_total_mem json DEFAULT NULL COMMENT '显卡总显存大小，int数组',
+  gpu_used_mem json DEFAULT NULL COMMENT '显卡已使用的显存大小，int数组',
+  gpu_temperture json DEFAULT NULL COMMENT '显卡的温度，int数组',
+  gpu_mem_utilize json DEFAULT NULL COMMENT '显卡的利用率，int数组'
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
+
+insert_sql: INSERT INTO {} (user_id,machine_name,timehms,hard_disk_total,
+  hard_disk_used,hard_disk_used_percent,cpu_percent,cpu_logic_num,cpu_each_core_uesd,
+  mem_total,mem_avail,net_send_rate,net_rcv_rate,os_name,os_startup_time,gpu_id,gpu_name,
+  gpu_total_mem,gpu_used_mem,gpu_temperture,gpu_mem_utilize) 
+  VALUES({},'{}','{}',{},{},{},{},{},'{}',{},{},{},{},'{}','{}','{}','{}','{}','{}','{}','{}')
+
+select_all_metrics_sql: SELECT user_id, machine_name,timehms,hard_disk_total,
+  hard_disk_used,hard_disk_used_percent,cpu_percent,cpu_logic_num,
+  cpu_each_core_uesd,mem_total,mem_avail,net_send_rate,net_rcv_rate,
+  os_name,os_startup_time,gpu_id,gpu_name,gpu_total_mem,gpu_used_mem,
+  gpu_temperture,gpu_mem_utilize FROM {} WHERE machine_name = '{}' AND user_id  = 
+  (SELECT id from user u WHERE accountnum = '{}') ORDER BY timehms DESC LIMIT 1
+
+search_net_last_10_data_sql: SELECT net_send_rate ,net_rcv_rate, timehms 
+  FROM {} WHERE machine_name = '{}' AND user_id  = (SELECT id from user u WHERE accountnum = '{}')
+  ORDER BY timehms DESC LIMIT 10
+

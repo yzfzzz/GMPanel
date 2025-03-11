@@ -1,7 +1,8 @@
 find_package(protobuf CONFIG REQUIRED)
-# find_package(gRPC CONFIG REQUIRED)
-# find_package(c-ares CONFIG)
-
+if(RPC_TYPE STREQUAL "grpc")
+find_package(gRPC CONFIG REQUIRED)
+find_package(c-ares CONFIG)
+endif()
 
 set(PROTO_FILES
     monitor_info.proto
@@ -11,28 +12,37 @@ set(PROTO_FILES
     mem_info.proto
     net_info.proto
     gpu_info.proto
+    hard_disk.proto
+    os.proto
     time.proto
     query.proto
     login_register.proto
 )
-
-# ������̬��
 add_library(monitor_proto ${PROTO_FILES})
-# ���Ӿ�̬��
+
 target_link_libraries(monitor_proto
     PUBLIC
         protobuf::libprotobuf
-        # gRPC::grpc
-        # gRPC::grpc++
 )
-# ָ�����ͷ�ļ�·��
+
+if(RPC_TYPE STREQUAL "grpc")
+target_link_libraries(monitor_proto
+    PUBLIC
+        gRPC::grpc
+        gRPC::grpc++
+)
+endif()
+
 target_include_directories(monitor_proto PUBLIC
 ${PROTOBUF_INCLUDE_DIRS}
-# ����о����Բ���
 ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
+if(RPC_TYPE STREQUAL "grpc")
+    get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
+endif()
 protobuf_generate(TARGET monitor_proto LANGUAGE cpp)
-# protobuf_generate(TARGET monitor_proto LANGUAGE grpc GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")
+if(RPC_TYPE STREQUAL "grpc")
+protobuf_generate(TARGET monitor_proto LANGUAGE grpc GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")
+endif()
 

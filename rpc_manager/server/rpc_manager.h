@@ -1,4 +1,8 @@
 #pragma once
+#define MPRPC 1
+#define GRPC 2
+#define RPC_TYPE_DEFINE MPRPC
+#include <yaml-cpp/yaml.h>
 #include <cstdlib>
 #include <ctime>
 #include <memory>
@@ -7,27 +11,50 @@
 #include <thread>
 #include <unordered_map>
 #include "connection_pool.h"
+#include "json.hpp"
+#include "log.h"
 #include "midinfo.h"
-#include "monitor_info.pb.h"
-#include "mprpcapplication.h"
-#include "mysql_conn.h"
-#include "rpcprovider.h"
-namespace monitor {
 
-class ServerManagerImpl : public monitor::proto::MonitorManager {
+#if RPC_TYPE_DEFINE == MPRPC
+#include "mprpcapplication.h"
+#include "rpcprovider.h"
+#elif RPC_TYPE_DEFINE == GRPC
+#include <grpcpp/support/status.h>
+#include "monitor_info.grpc.pb.h"
+#endif
+
+#include "monitor_info.pb.h"
+#include "mysql_conn.h"
+namespace monitor {
+#if RPC_TYPE_DEFINE == MPRPC
+class ServerManagerImpl : public monitor::proto::MonitorManager
+#elif RPC_TYPE_DEFINE == GRPC
+class ServerManagerImpl : public monitor::proto::MonitorManager::Service
+#endif
+{
    public:
     ServerManagerImpl();
     virtual ~ServerManagerImpl();
 
+#if RPC_TYPE_DEFINE == MPRPC
     void SetMonitorInfo(::google::protobuf::RpcController* controller,
                         const ::monitor::proto::MonitorInfo* request,
                         ::google::protobuf::Empty* response,
                         ::google::protobuf::Closure* done);
-
     void GetMonitorInfo(::google::protobuf::RpcController* controller,
                         const ::monitor::proto::QueryMessage* request,
                         ::monitor::proto::QueryResults* response,
                         ::google::protobuf::Closure* done);
+#elif RPC_TYPE_DEFINE == GRPC
+    ::grpc::Status SetMonitorInfo(::grpc::ServerContext* context,
+                                  const ::monitor::proto::MonitorInfo* request,
+                                  ::google::protobuf::Empty* response);
+
+    ::grpc::Status GetMonitorInfo(::grpc::ServerContext* context,
+                                  const ::monitor::proto::QueryMessage* request,
+                                  ::monitor::proto::QueryResults* response);
+#endif
+
     // 插入一条数据
     bool insertOneInfo(monitor::proto::MonitorInfo& monitor_infos_);
     // 根据账号名查询用户id
@@ -38,40 +65,46 @@ class ServerManagerImpl : public monitor::proto::MonitorManager {
 
     MidInfo parseInfos(monitor::proto::MonitorInfo& monitor_infos_);
 
-    ::monitor::proto::QueryResults queryDataInfo(
-        const ::monitor::proto::QueryMessage* request);
+    template <typename T>
+    std::string toJsonStr(std::vector<T>& v) {
+        nlohmann::json json_data = v;
+        return json_data.dump();
+    }
+
+    bool queryDataInfo(const ::monitor::proto::QueryMessage* request,
+                       ::monitor::proto::QueryResults* response);
 
    private:
+    YAML::Node sql_book;
     std::mutex create_mutex_;
     std::mutex set_mutex_;
     std::mutex get_mutex_;
     monitor::proto::MonitorInfo monitor_infos_;
     ConnectionPool* pool = ConnectionPool::getConnectPool();
-
-    std::string create_subsql_ =
-        std::string("(gpu_num int DEFAULT NULL,") +
-        "gpu_name varchar(100) DEFAULT NULL," +
-        "gpu_used_mem int DEFAULT NULL," + "gpu_total_mem int DEFAULT NULL," +
-        "gpu_avg_util int DEFAULT NULL," +
-        "cpu_load_avg_1 float DEFAULT NULL," +
-        "cpu_load_avg_3 float DEFAULT NULL," +
-        "cpu_load_avg_15 float DEFAULT NULL," + "mem_used float DEFAULT NULL," +
-        "mem_total float DEFAULT NULL," + "net_send_rate float DEFAULT NULL," +
-        "net_rcv_rate float DEFAULT NULL," + "user_id int NOT NULL," +
-        "time time NOT NULL," + "machine_name varchar(100) DEFAULT NULL" +
-        ") ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=" +
-        "utf8_general_ci COMMENT='create table according to date'";
 };
 
-class UserManagerImpl : public monitor::proto::UserManager {
+#if RPC_TYPE_DEFINE == MPRPC
+class UserManagerImpl : public monitor::proto::UserManager
+#elif RPC_TYPE_DEFINE == GRPC
+class UserManagerImpl : public monitor::proto::UserManager::Service
+#endif
+{
    public:
     UserManagerImpl();
     virtual ~UserManagerImpl();
 
+#if RPC_TYPE_DEFINE == MPRPC
     void LoginRegister(::google::protobuf::RpcController* controller,
                        const ::monitor::proto::UserMessage* request,
                        ::monitor::proto::UserResponseMessage* response,
                        ::google::protobuf::Closure* done);
+#elif RPC_TYPE_DEFINE == GRPC
+    ::grpc::Status LoginRegister(
+        ::grpc::ServerContext* context,
+        const ::monitor::proto::UserMessage* request,
+        ::monitor::proto::UserResponseMessage* response);
+
+#endif
 
     std::string verifyLoginInformation();
     std::string registerNewUser();

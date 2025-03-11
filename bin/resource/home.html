@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GMPanel</title>
+    <link rel="icon" type="image/x-icon" href="./background_img/icon.ico">
     <link rel="stylesheet" href="http://at.alicdn.com/t/c/font_4835994_c6h6p88ea9j.css">
     <link rel="stylesheet" href="https://at.alicdn.com/t/c/font_3957413_8w2n19m9w1.css">
+    <title>GMPanel</title>
     <style>
         /* 全局样式 */
         body {
@@ -68,16 +69,41 @@
 
         .progress-bar {
             background-color: #e0e0e0;
-            border-radius: 5px;
+            border-radius: 10px;
             overflow: hidden;
-            height: 15px;
+            height: 20px;
             margin: 8px 0;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         .progress-bar div {
-            background-color: #76c7c0;
+            background: linear-gradient(45deg, #76c7c0, #4aa3a1);
             height: 100%;
             transition: width 0.3s ease;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .progress-bar div::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+            border-radius: 10px;
+        }
+
+        .progress-bar div span {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
         }
 
         .chart-container {
@@ -118,39 +144,130 @@
             background-color: #fff;
             cursor: pointer;
         }
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            table-layout: auto; /* 让列宽根据内容动态调整 */
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            word-wrap: break-word; /* 防止长文本溢出 */
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+            position: sticky;
+            top: 0; /* 表头固定 */
+        }
+        
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* 动态调整列宽 */
+        table th:nth-child(1) { width: 15%; }
+        table th:nth-child(2) { width: 15%; }
+        table th:nth-child(3) { width: 20%; }
+        table th:nth-child(4) { width: 15%; }
+        table th:nth-child(5) { width: 15%; }
+
+        /* 对话框样式 */
+        .dialog {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dialog-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .dialog-content button {
+            margin: 10px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #confirmBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #cancelBtn {
+            background-color: #f44336;
+            color: white;
+        }
 
         /* 响应式设计 */
-        @media (max-width: 768px) {
+        /* @media (max-width: 768px) {
             .container {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(1, 1fr);
             }
 
             .chart-container {
-                grid-column: span 2;
+                grid-column: span 1;
             }
 
             .card {
-                grid-column: span 2;
+                grid-column: span 1;
             }
-        }
+
+            table th:nth-child(1) { width: 20%; }
+            table th:nth-child(2) { width: 20%; }
+            table th:nth-child(3) { width: 25%; }
+            table th:nth-child(4) { width: 15%; }
+            table th:nth-child(5) { width: 20%; }
+        } */
 
         @media (max-width: 480px) {
             .container {
-                grid-template-columns: 1fr;
+                grid-template-columns: (6, 1fr);
             }
 
             .chart-container {
-                grid-column: span 1;
+                grid-column: span 6;
             }
 
             .card {
-                grid-column: span 1;
+                grid-column: span 6;
+            }
+            table th:nth-child(1) { width: 25%; }
+            table th:nth-child(2) { width: 25%; }
+            table th:nth-child(3) { width: 30%; }
+            table th:nth-child(4) { width: 10%; }
+            table th:nth-child(5) { width: 10%; }
+            th, td {
+                padding: 8px; /* 减小单元格内边距 */
             }
         }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">GPU Monitor Panel</h1>
+    <h1 style="text-align: center;">😉GPU服务器管理面板</h1>
     <!-- 下拉选项框 -->
     <div class="dropdown">
         <label for="gpuDropdown">选择机器名：</label>
@@ -162,36 +279,36 @@
         <div class="card" id="basicInfoCard">
             <h2>基本信息</h2>
             <p><i class="iconfont icon-yonghu-yuan icon-relative" style="vertical-align: middle;"></i> 用户: <span id="userInfo">12345678</span></p>
-            <p><i class="iconfont icon-xianka icon-relative" style="vertical-align: middle;"></i> 显卡型号: <span id="gpuModel">NVIDIA GeForce MX350</span></p>
-            <p><i class="iconfont icon-shuzi icon-relative" style="vertical-align: middle;"></i> 显卡数量: <span id="gpuCount">1</span></p>
+            <p><i class="iconfont icon-xianka icon-relative" style="vertical-align: middle;"></i> 操作系统: <span id="os_name">NVIDIA GeForce MX350</span></p>
+            <p><i class="iconfont icon-shuzi icon-relative" style="vertical-align: middle;"></i> 机器启动时间: <span id="os_startup_time">1</span></p>
         </div>
 
         <!-- 运行内存 -->
-        <div class="card" id="cpuMemoryCard">
-            <h3>CPU负载</h3>
-            <p><span id="cpuUsage">37%</span></p>
-            <div class="progress-bar">
-                <div id="cpuUsageBar" style="width: 37%;"></div>
-            </div>
+        <div class="card" id="cpuCard">
+            <h3>CPU 核心数量</h3>
+            <p><span id="cpu_logic_num">0</span></p>
+            <!-- <div class="progress-bar">
+                <div id="cpu_logic_numBar" style="width: 0%;"></div>
+            </div> -->
 
-            <h3>运行内存</h3>
-            <p><span id="memoryUsage">72%</span></p>
+            <h3>CPU 平均负载</h3>
+            <p><span id="cpu_percent">0%</span></p>
             <div class="progress-bar">
-                <div id="memoryUsageBar" style="width: 72%;"></div>
+                <div id="cpu_percentBar" style="width:0%;"><span id="cpu_percentBar-text">0%</span></div>
             </div>
         </div>
 
         <!-- 内存和显存使用率 -->
-        <div class="card" id="memoryGpuCard">
-            <h3>显卡使用率</h3>
-            <p><span id="gpuUsage">37%</span></p>
+        <div class="card" id="memoryCard">
+            <h3>内存占用</h3>
+            <p><span id="memUsage">0%</span></p>
             <div class="progress-bar">
-                <div id="gpuUsageBar" style="width: 37%;"></div>
+                <div id="memUsageBar" style="width: 0%;"><span id="memUsageBar-text">0%</span></div>
             </div>
-            <h3>显存使用</h3>
-            <p><span id="vramUsage">37%</span></p>
+            <h3>硬盘占用</h3>
+            <p><span id="hard_diskUsage">0%</span></p>
             <div class="progress-bar">
-                <div id="vramUsageBar" style="width: 37%;"></div>
+                <div id="hard_diskUsageBar" style="width: 0%;"><span id="hard_diskUsageBar-text">0%</span></div>
             </div>
         </div>
 
@@ -201,52 +318,96 @@
             <canvas id="trafficChart"></canvas>
         </div>
 
-        <!-- GPU 平均使用率 -->
+        <!-- CPU各个处理器平均使用率 -->
         <div class="chart-container">
-            <h2>GPU 平均使用率</h2>
-            <canvas id="gpuChart"></canvas>
+            <h2>CPU 各核心负载</h2>
+            <canvas id="cpu_each_core_uesd"></canvas>
         </div>
-    </div>
+
+        <div class="chart-container" style="grid-column: span 6;">
+            <h2>GPU 详细信息</h2>
+            <table id="gpuTable">
+                <thead>
+                    <tr>
+                        <th>GPU ID</th>
+                        <th>显卡型号</th>
+                        <th>显存使用</th>
+                        <th>使用率</th>
+                        <th>温度</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 数据通过 JavaScript 动态填充 -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 对话框 -->
+        <div id="customDialog" class="dialog">
+            <div class="dialog-content">
+                <p><span id="dialog_message">❌警告: 当前机器未运行!!!</span></p>
+                <button id="confirmBtn">确认</button>
+            </div>
+        </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+
+        // JavaScript 逻辑
+        const customDialog = document.getElementById("customDialog");
+        const confirmBtn = document.getElementById("confirmBtn");
+        // 确认按钮点击事件
+        confirmBtn.addEventListener("click", function () {
+            customDialog.style.display = "none"; // 隐藏对话框
+        });
+
+        // 点击对话框外部关闭对话框
+        customDialog.addEventListener("click", function (event) {
+            if (event.target === customDialog) {
+                customDialog.style.display = "none"; // 隐藏对话框
+            }
+        });
+
         // 数据修改接口
         const updateData = {
             // 更新用户信息
             setUserInfo: (user) => {
                 document.getElementById('userInfo').textContent = user;
             },
-            // 更新显卡型号
-            setGpuModel: (model) => {
-                document.getElementById('gpuModel').textContent = model;
+            // 更新操作系统
+            setOs_Name: (os_name) => {
+                document.getElementById('os_name').textContent = os_name;
             },
-            // 更新显卡数量
-            setGpuCount: (count) => {
-                document.getElementById('gpuCount').textContent = count;
+            // 更新机器启动时间
+            setOs_Startup_Time: (os_time) => {
+                document.getElementById('os_startup_time').textContent = os_time;
             },
-            // 更新 CPU 使用率
-            setCpuUsage: (usage) => {
-                document.getElementById('cpuUsage').textContent = `${usage}%`;
-                document.getElementById('cpuUsageBar').style.width = `${usage}%`;
+            // 更新 CPU 逻辑核心数
+            setCpu_Logic_Num: (usage) => {
+                document.getElementById('cpu_logic_num').textContent = `${usage}`;
+            },
+            // 更新CPU使用占比
+            setCpu_Percent: (usage) => {
+                document.getElementById('cpu_percent').textContent = `${usage.toFixed(2)}%`;
+                document.getElementById('cpu_percentBar').style.width = `${usage}%`;
+                document.getElementById('cpu_percentBar-text').textContent = `${usage.toFixed(2)}%`;
             },
             // 更新内存使用率
-            setMemoryUsage: (usage) => {
-                document.getElementById('memoryUsage').textContent = `${usage}%`;
-                document.getElementById('memoryUsageBar').style.width = `${usage}%`;
+            setMemUsage:(total,avail, percent) =>{
+                document.getElementById('memUsageBar').style.width = `${percent}%`;
+                document.getElementById('memUsage').innerHTML = `${percent.toFixed(2)}%&nbsp;&nbsp;${(total-avail).toFixed(2)}/${total.toFixed(2)} GB`;
+                document.getElementById('memUsageBar-text').textContent = `${percent.toFixed(2)}%`;
             },
-            // 更新 GPU 使用率
-            setGpuUsage: (usage) => {
-                document.getElementById('gpuUsage').textContent = `${usage}%`;
-                document.getElementById('gpuUsageBar').style.width = `${usage}%`;
+            // 更新硬盘占用
+            setHard_DiskUsage: (used,total,percent) => {
+                document.getElementById('hard_diskUsage').innerHTML = `${percent.toFixed(2)}%&nbsp;&nbsp;${used.toFixed(2)}/${total.toFixed(2)} GB`;
+                document.getElementById('hard_diskUsageBar').style.width = `${percent}%`;
+                document.getElementById('hard_diskUsageBar-text').textContent = `${percent.toFixed(2)}%`;
             },
-            // 更新显存使用率
-            setVramUsage: (usage) => {
-                document.getElementById('vramUsage').textContent = `${usage}%`;
-                document.getElementById('vramUsageBar').style.width = `${usage}%`;
-            },
-            setGpuChart: (usage) => {
-                gpuChart.data.datasets[0].data = usage;
-                gpuChart.update();
+            setCpu_Each_Core_UesdChart: (usage) => {
+                cpu_core_Chart.data.datasets[0].data = usage;
+                cpu_core_Chart.data.labels = usage.map((_, index) => `核心 ${index + 1}`),
+                cpu_core_Chart.update();
             },
             setNetUpLoad: (usage) => {
                 trafficChart.data.datasets[0].data = usage;
@@ -257,10 +418,8 @@
                 trafficChart.update();
             },
             setTime: (usage) => {
-                gpuChart.data.labels = usage;
                 trafficChart.data.labels = usage;
                 trafficChart.update();
-                gpuChart.update();
             },
             setMachine: (usage) => {
                 console.log(usage);
@@ -272,6 +431,22 @@
                     option.textContent = machine;
                     gpuDropdown.appendChild(option);
                 }
+            },
+            setGpuTable: (gpu_id,gpu_name,gpu_used_mem,gpu_total_mem,gpu_mem_utilize,gpu_temperture) => {
+                const tbody = document.querySelector('#gpuTable tbody');
+                tbody.innerHTML = ''; // 清空现有数据
+                for(let i =0;i< gpu_id.length;i++)
+                {
+                    tbody.innerHTML += `
+                       <tr>
+                            <td>${gpu_id[i]}</td>
+                            <td>${gpu_name[i]}</td>
+                            <td>${gpu_used_mem[i]}/${gpu_total_mem[i]} MB</td>
+                            <td>${gpu_mem_utilize[i]} %</td>
+                            <td>${gpu_temperture[i]} °C</td>
+                        </tr>
+                    `;
+                }
             }
         };
 
@@ -279,6 +454,10 @@
         // 定时获取服务器数据
         const fetchServerData = (endpoint = '/data') => {
                 const params = {account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value };
+                if(!document.getElementById('gpuDropdown').value)
+                {
+                    customDialog.style.display = "flex"; // 显示对话框
+                }
                 // 将参数拼接到URL中（如果需要）
                 const url = new URL(endpoint, window.location.origin);
                 Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
@@ -292,40 +471,65 @@
                 })
                 .then(data => {
                     console.log('Server data:', data); // 打印解析后的数据
+                    if(!data.os_name)
+                    {
+                        customDialog.style.display = "flex"; // 显示对话框
+                    }
                     // 在这里处理数据，例如更新页面内容
-                    if (data.userInfo !== undefined) {
+                    if (data.userInfo) {
                         updateData.setUserInfo(data.userInfo);
                     }
-                    if (data.gpuModel !== undefined) {
-                        updateData.setGpuModel(data.gpuModel);
+                    // 操作系统
+                    if (data.os_name) {
+                        updateData.setOs_Name(data.os_name);
                     }
-                    if (data.cpuUsage !== undefined) {
-                        updateData.setCpuUsage(data.cpuUsage);
+                    if (data.os_startup_time) {
+                        updateData.setOs_Startup_Time(data.os_startup_time);
                     }
-                    if (data.memoryUsage !== undefined) {
-                        updateData.setMemoryUsage(data.memoryUsage);
+                    // cpu
+                    if (data.cpu_logic_num !== undefined) {
+                        updateData.setCpu_Logic_Num(data.cpu_logic_num);
                     }
-                    if (data.gpuUsage !== undefined) {
-                        updateData.setGpuUsage(data.gpuUsage);
+                    if (data.cpu_percent !== undefined) {
+                        updateData.setCpu_Percent(data.cpu_percent);
                     }
-                    if (data.vramUsage !== undefined) {
-                        updateData.setVramUsage(data.vramUsage);
+                    // cpu各个核心的使用率
+                    if (data.cpu_each_core_uesd !== undefined) {
+                        updateData.setCpu_Each_Core_UesdChart(data.cpu_each_core_uesd);
                     }
-                    if (data.gpuChart !== undefined) {
-                        updateData.setGpuChart(data.gpuChart);
+
+                    // 内存
+                    if (data.mem_used_percent !== undefined && data.mem_total !== undefined && data.mem_avail!== undefined) {
+                        updateData.setMemUsage(data.mem_total,data.mem_avail,data.mem_used_percent);
                     }
-                    if (data.netUpload !== undefined) {
-                        updateData.setNetUpLoad(data.netUpload);
+
+                    // 磁盘
+                    if (data.hard_disk_used_percent !== undefined && data.hard_disk_total !== undefined && data.hard_disk_used !== undefined) {
+                        updateData.setHard_DiskUsage(data.hard_disk_used,data.hard_disk_total,data.hard_disk_used_percent);
                     }
-                    if (data.netDownload !== undefined) {
-                        updateData.setNetDownLoad(data.netDownload);
+
+                    // 网络
+                    if (data.net_send_rate_array !== undefined) {
+                        updateData.setNetUpLoad(data.net_send_rate_array.reverse());
                     }
-                    if (data.time !== undefined) {
-                        updateData.setTime(data.time);
+                    if (data.net_rcv_rate_array !== undefined) {
+                        updateData.setNetDownLoad(data.net_rcv_rate_array.reverse());
+                    }
+
+                    // 时间
+                    if (data.timehms_array !== undefined) {
+                        updateData.setTime(data.timehms_array.reverse());
+                    }
+
+                    // 显卡数组
+                    if(data.gpu_name !== undefined && data.gpu_id !== undefined && data.gpu_used_mem !== undefined && data.gpu_total_mem !== undefined && data.gpu_mem_utilize !== undefined && data.gpu_temperture !== undefined)
+                    {
+                        updateData.setGpuTable(data.gpu_id,data.gpu_name,data.gpu_used_mem,data.gpu_total_mem,data.gpu_mem_utilize,data.gpu_temperture);
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching server data:', error);
+
                 });
         };
 
@@ -341,35 +545,50 @@
             const selectedMachine = document.getElementById('gpuDropdown').value;
             fetchServerData('/data');
         });
-        // GPU 使用率图表
-        const gpuCtx = document.getElementById('gpuChart').getContext('2d');
-        const gpuChart = new Chart(gpuCtx, {
-            type: 'line',
+        // CPU 使用率图表
+        const ctx = document.getElementById('cpu_each_core_uesd').getContext('2d');
+
+        // 创建柱状图
+        const cpu_core_Chart = new Chart(ctx, {
+            type: 'bar', // 柱状图
             data: {
-                labels: ['10:40', '11:02', '11:25', '11:47', '12:10'],
+                labels: ['1', '2', ' 3', ' 4', ' 5'], // 横轴标签
                 datasets: [{
-                    label: 'GPU 使用率',
-                    data: [100.0, 75.0, 50.0, 25.0, 0.0],
-                    fill: true,
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.1
+                    label: 'CPU 核心使用率', // 数据集标签
+                    data: [0,0,0,0,0], // 数据
+                    backgroundColor: '#ffd3b6', // 柱状图颜色
+                    borderColor: '#ffd3b6', // 边框颜色
+                    borderWidth: 1 ,// 边框宽度
+                    shadowColor: 'rgba(0, 0, 0, 0.5)', // 阴影颜色
+                    shadowBlur: 10 // 阴影模糊半径
                 }]
             },
             options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    }
-                },
+                responsive: true, // 图表自适应
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true, // y 轴从 0 开始
+                        title: {
+                            display: true,
+                            text: '使用率 (%)' // y 轴标题
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: false,
+                            text: 'CPU 核心' // x 轴标题
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true, // 显示图例
+                        position: 'top' // 图例位置
                     }
                 }
             }
         });
+
 
         // 流量收发情况图表
         const trafficCtx = document.getElementById('trafficChart').getContext('2d');
@@ -413,5 +632,9 @@
 
         setInterval(fetchServerData, 5000,'/data');
     </script>
+     <!-- 添加跳转到GitHub的链接 -->
+     <footer style="text-align: center; margin-top: 20px;">
+        <a href="https://github.com/yzfzzz/GMPanel/tree/develop" target="_blank">📔欢迎访问GitHub仓库</a>
+    </footer>
 </body>
 </html>
