@@ -1,6 +1,4 @@
-#define MPRPC 1
-#define GRPC 2
-#define RPC_TYPE_DEFINE MPRPC
+#include "config.h"
 #if RPC_TYPE_DEFINE == MPRPC
 #include "mprpcapplication.h"
 #endif
@@ -51,7 +49,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
     std::string path = req.path();
     if (files_cache.find(path) != files_cache.end()) {
         resp->setStatusCode(HttpResponse::k200Ok);
-        resp->addHeader("Cache-Control", "public, max-age=60, immutable");
+        // resp->addHeader("Cache-Control", "public, max-age=60, immutable");
         resp->setStatusMessage("OK");
         resp->setContentType("text/html");
         resp->setBody(files_cache.find(path)->second);
@@ -77,7 +75,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
             resp->setStatusCode(HttpResponse::k200Ok);
             resp->setStatusMessage("OK");
             resp->setContentType("text/plain");
-            resp->setBody(query_data.toJsonStr());
+            resp->setBody(query_data.json_string);
         } else {
             resp->setStatusCode(HttpResponse::k400BadRequest);
             resp->setStatusMessage("Unauthorized");
@@ -100,7 +98,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
             resp->setStatusCode(HttpResponse::k200Ok);
             resp->setStatusMessage("OK");
             resp->setContentType("text/plain");
-            resp->setBody(user_manage.data.dump());
+            resp->setBody(user_manage.json_string);
         } else {
             resp->setStatusCode(HttpResponse::k400BadRequest);
             resp->setStatusMessage("Unauthorized");
@@ -129,7 +127,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
             resp->setStatusCode(HttpResponse::k200Ok);
             resp->setStatusMessage("OK");
             resp->setContentType("text/plain");
-            resp->setBody(user_manage.data.dump());
+            resp->setBody(user_manage.json_string);
         } else {
             resp->setStatusCode(HttpResponse::k400BadRequest);
             resp->setStatusMessage("Unauthorized");
@@ -169,7 +167,7 @@ void yamlInit() {
 }
 
 void serverInit() {
-    yamlInit(); 
+    yamlInit();
     EventLoop loop;
     HttpServer server(&loop, InetAddress("10.0.4.3", 80), "http_server");
     server.setHttpCallback(onRequest);
@@ -178,8 +176,8 @@ void serverInit() {
 }
 
 #if RPC_TYPE_DEFINE == MPRPC
-int main(int argv, char** argc) {
-    MprpcApplication::Init(argv, argc);
+int main() {
+    MprpcApplication::Init(rpc_config_path);
     serverInit();
 }
 #elif RPC_TYPE_DEFINE == GRPC
