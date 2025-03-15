@@ -1,7 +1,4 @@
 #pragma once
-#define MPRPC 1
-#define GRPC 2
-#define RPC_TYPE_DEFINE MPRPC
 #include <yaml-cpp/yaml.h>
 #include <cstdlib>
 #include <ctime>
@@ -10,6 +7,7 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include "config.h"
 #include "connection_pool.h"
 #include "json.hpp"
 #include "log.h"
@@ -62,6 +60,16 @@ class ServerManagerImpl : public monitor::proto::MonitorManager::Service
     bool isTableExist(std::string tableName,
                       std::shared_ptr<MysqlConn> conn_ptr);
     bool isMachineExist(std::string user_id, std::string machine_name);
+
+    bool updateMachineStatus(std::string machine_name);
+
+    std::string formatDate(const std::string& datetime) {
+        if (datetime.empty()) {
+            return "";
+        }
+        return datetime.substr(0, 4) + datetime.substr(5, 2) +
+               datetime.substr(8, 2);
+    }
 
     MidInfo parseInfos(monitor::proto::MonitorInfo& monitor_infos_);
 

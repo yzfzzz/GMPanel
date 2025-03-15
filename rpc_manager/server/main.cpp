@@ -20,11 +20,11 @@ void InitServer() {
 #endif
 
 #if RPC_TYPE_DEFINE == MPRPC
-int main(int argv, char** argc) {
+int main() {
     std::string log_path = "./logs";
     monitor::SetupLogging(log_path);
     // 调用框架的初始化操作
-    MprpcApplication::Init(argv, argc);
+    MprpcApplication::Init(rpc_config_path);
     RpcProvider provider;
     // 在zookeeper中挂载函数
     provider.NotifyService(new monitor::ServerManagerImpl());

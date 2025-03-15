@@ -68,7 +68,7 @@ void ServerManagerImpl::GetMonitorInfo(
     ::monitor::proto::QueryResults* response,
     ::google::protobuf::Closure* done) {
     std::lock_guard<std::mutex> lock(get_mutex_);
-    // LOG(INFO) << "RPC Call: ServerManagerImpl::GetMonitorInfo";
+    LOG(INFO) << "RPC Call: ServerManagerImpl::GetMonitorInfo";
     queryDataInfo(request, response);
     done->Run();
 }
@@ -91,16 +91,52 @@ void ServerManagerImpl::GetMonitorInfo(
 bool ServerManagerImpl::queryDataInfo(
     const ::monitor::proto::QueryMessage* request,
     ::monitor::proto::QueryResults* response) {
-    // std::string sql = request->sql();
-    std::string table_name = "table_" + request->timeymd();
     std::string machine_name = request->machine_name();
     std::string accountnum = request->accountnum();
-
-    std::string sql =
-        fmt::format(sql_book["select_all_metrics_sql"].as<std::string>(),
-                    table_name, machine_name, accountnum);
-    // LOG(INFO) << "sql: " << sql;
     std::shared_ptr<MysqlConn> conn_ptr = this->pool->getConnection();
+    std::string sql;
+    std::map<std::string, std::string> machine_map;
+    LOG(INFO) << "ServerManagerImpl::queryDataInfo";
+    // 查询机器状态
+    sql = fmt::format(sql_book["search_machine_status_sql"].as<std::string>(),
+                      accountnum);
+    if (conn_ptr->query(sql) == true) {
+        while (conn_ptr->next()) {
+            LOG(INFO) << "search_machine_status: " << conn_ptr->value(0) << " "
+                      << conn_ptr->value(1);
+            machine_map[conn_ptr->value(0)] = formatDate(conn_ptr->value(1));
+            auto machine_status = response->add_machine_status();
+            machine_status->set_machine_name(conn_ptr->value(0));
+            machine_status->set_last_update_time(conn_ptr->value(1));
+        }
+    } else {
+        return false;
+    }
+    // 查询机器是否超1个小时没更新了，如果没更新就返回空
+    // sql = fmt::format(
+    //     "SELECT
+    //     IF(TIMESTAMPDIFF(
+    //            HOUR, NOW(),
+    //            (SELECT last_update_time FROM machine m WHERE machine_name =
+    //                 '{}' AND user_id =
+    //                     (SELECT id from `user` u WHERE accountnum = '{}'))) >
+    //                     1,
+    //        FALSE, TRUE) AS result ",
+    //     machine_name,
+    //     accountnum);
+    // bool flag;
+    // if (conn_ptr->query(sql) == true) {
+    //     while (conn_ptr->next()) {
+    //         flag = stoi(conn_ptr->value(0));
+    //     }
+    // }
+    // if (!flag) {
+    //     return false;
+    // }
+    std::string table_name = "table_" + machine_map[machine_name];
+    sql = fmt::format(sql_book["select_all_metrics_sql"].as<std::string>(),
+                      table_name, machine_name, accountnum);
+    // LOG(INFO) << "sql: " << sql;
     if (conn_ptr->query(sql) == true) {
         while (conn_ptr->next()) {
             response->set_machine_name(conn_ptr->value(MACHINE_NAME));
@@ -141,7 +177,6 @@ bool ServerManagerImpl::queryDataInfo(
     sql = fmt::format(sql_book["search_net_last_10_data_sql"].as<std::string>(),
                       table_name, machine_name, accountnum);
 
-    LOG(INFO) << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__;
     if (conn_ptr->query(sql) == true) {
         while (conn_ptr->next()) {
             response->add_net_send_rate(std::stof(conn_ptr->value(0)));
@@ -151,7 +186,6 @@ bool ServerManagerImpl::queryDataInfo(
     } else {
         return false;
     }
-
     return true;
 }
 
@@ -243,9 +277,23 @@ bool ServerManagerImpl::insertOneInfo(
     LOG(INFO) << "InsertOneInfo SQL: " << sql;
     if (conn_ptr->update(sql)) {
         LOG(INFO) << "Succeed to insert one sql";
-        return true;
+        if (updateMachineStatus(mid_info.machine_name)) {
+            return true;
+        }
     }
     LOG(WARNING) << "Failed to insert one sql";
+    return false;
+}
+
+bool ServerManagerImpl::updateMachineStatus(std::string machine_name) {
+    std::shared_ptr<MysqlConn> conn_ptr = this->pool->getConnection();
+    std::string sql = fmt::format(
+        "UPDATE machine SET last_update_time = (SELECT NOW()) where "
+        "machine_name = '{}'",
+        machine_name);
+    if (conn_ptr->update(sql)) {
+        return true;
+    }
     return false;
 }
 
@@ -288,8 +336,7 @@ bool ServerManagerImpl::isMachineExist(std::string user_id,
 
 bool ServerManagerImpl::isTableExist(std::string table_name,
                                      std::shared_ptr<MysqlConn> conn_ptr) {
-    std::string select_sql = fmt::format(
-        "SELECT * FROM tableRegister tr WHERE table_name = '{}'", table_name);
+    std::string select_sql = fmt::format("SHOW TABLES LIKE '{}'", table_name);
     if (conn_ptr->query(select_sql) == true) {
         if (conn_ptr->next()) {
             return true;
@@ -300,11 +347,7 @@ bool ServerManagerImpl::isTableExist(std::string table_name,
             std::string create_table_sql =
                 fmt::format("CREATE TABLE {} {}", table_name,
                             sql_book["create_table_sql"].as<std::string>());
-            std::string register_sql = fmt::format(
-                "INSERT INTO tableRegister (table_name) values('{}')",
-                table_name);
-            if (conn_ptr->update(create_table_sql) &&
-                conn_ptr->update(register_sql)) {
+            if (conn_ptr->update(create_table_sql)) {
                 return true;
             }
             return false;
