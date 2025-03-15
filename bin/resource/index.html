@@ -210,8 +210,8 @@
             <div class="signup-link">
                 <p>Don't have an account? <a href="register.html">Create one.</a></p>
             </div>
+            <div id="errorMessage" class="error-message"></div>
         </form>
-        <div id="errorMessage" class="error-message"></div>
     </div>
 
     <script>
@@ -245,18 +245,21 @@
                     return response.json(); // 将响应解析为 JSON
                 })
             .then(data => {
-                if (data.state === 'login successful') {
-                    const account_num=  data.account_num;
-                    const machine_name = data.machine_name;
+                if (data.response_str === 'login successful') {
+                    const account_num=  document.getElementById("usernameInput").value;
+                    const machine_name = data.machine_name_array;
                     const json_data = {
-                        account_num: data.account_num,
-                        machine_name: data.machine_name
+                        account_num: account_num,
+                        machine_name_array: data.machine_name_array
                     };
-                    document.cookie = JSON.stringify(json_data);
-                    console.log(document.cookie);
-                    window.location.href = '/home.html'; // 跳转到主页
+                    const message = "data="+JSON.stringify(json_data);
+                    const encodedMessage = encodeURIComponent(message); // 编码消息
+                    // document.cookie = JSON.stringify(json_data);
+                    // console.log(document.cookie);
+                    window.location.href = `/home.html#${message}`; // 跳转到主页
                 } else {
-                    document.getElementById('errorMessage').textContent = data.state;
+                    document.getElementById('errorMessage').textContent = data.response_str;
+                    document.getElementById('errorMessage').style.color = "white"; 
                 }
             })
             .catch(error => {
