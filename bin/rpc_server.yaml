@@ -1,0 +1,4 @@
+rpcserverip: 10.0.4.3
+rpcserverport: 50051
+zookeeperip: 10.0.4.3
+zookeeperport: 2181

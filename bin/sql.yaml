@@ -38,3 +38,6 @@ search_net_last_10_data_sql: SELECT net_send_rate ,net_rcv_rate, timehms
   FROM {} WHERE machine_name = '{}' AND user_id  = (SELECT id from user u WHERE accountnum = '{}')
   ORDER BY timehms DESC LIMIT 10
 
+search_machine_status_sql: SELECT machine_name, last_update_time FROM machine m WHERE user_id  = (SELECT id 
+  from user u WHERE accountnum = '{}')
+
