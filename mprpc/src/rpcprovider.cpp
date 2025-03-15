@@ -10,6 +10,7 @@ service_name => service描述
 */
 // 存储 UserService类、对应的函数, 方便随时调用
 void RpcProvider::NotifyService(google::protobuf::Service* service) {
+    //  service实际上就是monitor::proto::MonitorManager类
     ServiceInfo service_info;
     // 获取服务对象的描述信息
     const google::protobuf::ServiceDescriptor* pserviceDesc =
@@ -39,7 +40,7 @@ void RpcProvider::Run() {
         MprpcApplication::GetInstance().GetConfig().Load("rpcserverip");
     uint16_t port = atoi(MprpcApplication::GetInstance()
                              .GetConfig()
-                             .Load("rpcserverip")
+                             .Load("rpcserverport")
                              .c_str());
     muduo::net::InetAddress address(ip, port);
 
@@ -72,6 +73,7 @@ void RpcProvider::Run() {
             std::string method_path = service_path + "/" + mp.first;
             char method_path_data[128] = {0};
             // 存储当前这个rpc主机的ip和port
+            // TODO: 在内网和公网的情况下，zookeeper的节点信息错误
             sprintf(method_path_data, "%s:%d", ip.c_str(), port);
             zkCli.Create(method_path.c_str(), method_path_data,
                          strlen(method_path_data),
