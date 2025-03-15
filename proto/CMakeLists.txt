@@ -36,6 +36,7 @@ endif()
 target_include_directories(monitor_proto PUBLIC
 ${PROTOBUF_INCLUDE_DIRS}
 ${CMAKE_CURRENT_BINARY_DIR}
+${PROJECT_SOURCE_DIR}/
 )
 
 if(RPC_TYPE STREQUAL "grpc")

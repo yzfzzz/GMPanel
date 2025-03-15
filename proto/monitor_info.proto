@@ -15,8 +15,8 @@ import "hard_disk.proto";
 import "os.proto";
 
 // 使用mprpc需要true，使用grpc需要false
+// option cc_generic_services = true;
 option cc_generic_services = true;
-
 
 
 message MonitorInfo {
@@ -31,7 +31,6 @@ message MonitorInfo {
     string accountnum = 9;
     Time time = 10;
     string machine_name = 11;
-    
 }
 
 service MonitorManager {
