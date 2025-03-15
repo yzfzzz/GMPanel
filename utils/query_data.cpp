@@ -1,7 +1,20 @@
 #include "query_data.h"
+#include <google/protobuf/util/json_util.h>
 #include <algorithm>
 #include <iostream>
 #include "get_time.h"
+
+using google::protobuf::util::JsonStringToMessage;
+
+bool proto_to_json(const google::protobuf::Message& message,
+                   std::string& json) {
+    google::protobuf::util::JsonPrintOptions options;
+    options.add_whitespace = true;
+    options.always_print_primitive_fields = true;
+    options.preserve_proto_field_names = true;
+    return MessageToJsonString(message, &json, options).ok();
+}
+
 namespace monitor {
 bool QueryData::queryDataInfo(std::string account_num,
                               std::string machine_name) {
@@ -19,32 +32,38 @@ bool QueryData::queryDataInfo(std::string account_num,
     rpc_client.GetMonitorInfo(query_message, query_results);
 
     // TODO: 远端函数调用可能会失败，需要处理
-    ::monitor::proto::QueryResults* result = &query_results;
+    if (!proto_to_json(query_results, json_string)) {
+        std::cout << "protobuf convert json failed!" << std::endl;
+        return false;
+    }
+    return true;
+}
 
-    midinfo.machine_name = result->machine_name();
-    midinfo.hard_disk_total = result->hard_disk_total();
-    midinfo.hard_disk_used = result->hard_disk_used();
-    midinfo.hard_disk_used_percent = result->hard_disk_used_percent();
-    midinfo.cpu_percent = result->cpu_percent();
-    midinfo.cpu_logic_num = result->cpu_logic_num();
-    midinfo.cpu_each_core_uesd =
-        json2Vector<float>(result->cpu_each_core_uesd());
-    midinfo.mem_total = result->mem_total();
-    midinfo.mem_avail = result->mem_avail();
-    midinfo.os_name = result->os_name();
-    midinfo.os_startup_time = result->os_startup_time();
+bool UserManage::login(std::string account_num, std::string pwd) {
+    monitor::RpcClient rpc_client;
+    monitor::proto::UserMessage request;
+    monitor::proto::UserResponseMessage response;
+    request.set_account_num(account_num);
+    request.set_pwd(pwd);
+    rpc_client.LoginRegister(request, response);
+    if (!proto_to_json(response, json_string)) {
+        std::cout << "protobuf convert json failed!" << std::endl;
+        return false;
+    }
+    return true;
+}
 
-    midinfo.gpu_id = json2Vector<std::string>(result->gpu_id());
-    midinfo.gpu_name = json2Vector<std::string>(result->gpu_name());
-    midinfo.gpu_total_mem = json2Vector<int>(result->gpu_total_mem());
-    midinfo.gpu_used_mem = json2Vector<int>(result->gpu_used_mem());
-    midinfo.gpu_temperture = json2Vector<int>(result->gpu_temperture());
-    midinfo.gpu_mem_utilize = json2Vector<int>(result->gpu_mem_utilize());
-
-    for (int i = 0; i < result->net_rcv_rate_size(); i++) {
-        midinfo.net_rcv_rate_array.push_back(result->net_rcv_rate(i));
-        midinfo.net_send_rate_array.push_back(result->net_send_rate(i));
-        midinfo.timehms_array.push_back(result->timehms(i));
+bool UserManage::signup(std::string pwd) {
+    std::string account_num;
+    monitor::RpcClient rpc_client;
+    monitor::proto::UserMessage request;
+    monitor::proto::UserResponseMessage response;
+    request.set_account_num(account_num);
+    request.set_pwd(pwd);
+    rpc_client.LoginRegister(request, response);
+    if (!proto_to_json(response, json_string)) {
+        std::cout << "protobuf convert json failed!" << std::endl;
+        return false;
     }
     return true;
 }

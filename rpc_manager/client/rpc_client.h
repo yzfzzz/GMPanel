@@ -1,10 +1,8 @@
 #pragma once
-#define MPRPC 1
-#define GRPC 2
-#define RPC_TYPE_DEFINE MPRPC
 #include <fmt/format.h>
 #include <memory>
 #include <vector>
+#include "config.h"
 #include "json.hpp"
 #include "log.h"
 #include "login_register.pb.h"
