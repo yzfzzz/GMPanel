@@ -354,6 +354,7 @@
     <script>
 
         // JavaScript 逻辑
+        var cur_option;
         const customDialog = document.getElementById("customDialog");
         const confirmBtn = document.getElementById("confirmBtn");
         // 确认按钮点击事件
@@ -439,10 +440,15 @@
                         const last_update_time = machine.last_update_time;
                         option.textContent = "💻️"+machine_name+" 🕗"+last_update_time;
                     }
-                
+                    if(cur_option == undefined)
+                    {
+                        cur_option = machine_name;
+                    }
                     option.value = machine_name;
                     gpuDropdown.appendChild(option);
                 }
+                console.log(cur_option);
+                document.getElementById('gpuDropdown').value = cur_option;
             },
             setGpuTable: (gpu_id,gpu_name,gpu_used_mem,gpu_total_mem,gpu_mem_utilize,gpu_temperture) => {
                 const tbody = document.querySelector('#gpuTable tbody');
@@ -465,6 +471,7 @@
 
         // 定时获取服务器数据
         const fetchServerData = (endpoint = '/data') => {
+
                 const params = {account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value };
                 if(!document.getElementById('gpuDropdown').value)
                 {
@@ -568,7 +575,7 @@
         fetchServerData('/data');
         // 下拉框事件监听
         gpuDropdown.addEventListener('change', function () {
-            const selectedMachine = document.getElementById('gpuDropdown').value;
+            cur_option = document.getElementById('gpuDropdown').value;
             fetchServerData('/data');
         });
         // CPU 使用率图表
