@@ -34,7 +34,6 @@ docker run -it -d \
 -e LANG="C.UTF-8" \
 -v ${MONITOR_HOME_DIR}:/home/work \
 -v ${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR} \
---gpus all \
 --net host \
 --add-host=host.docker.internal:host-gateway  \
 linux:mprpc_monitor
