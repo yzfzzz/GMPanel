@@ -1,11 +1,13 @@
+#include "mprpcchannel.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <iomanip>  // 用于格式化输出
+#include <sstream>  // 用于字符串流操作
 #include "mprpcapplication.h"
-#include "mprpcchannel.h"
 #include "rpcheader.pb.h"
 #include "zookeeperutil.h"
 
@@ -56,13 +58,13 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     send_rpc_str += args_str;
 
     // 打印调试信息
-    // std::cout << "=========================" << std::endl;
-    // std::cout << "header_size: " << header_size << std::endl;
-    // std::cout << "rpc_header_str: " << rpc_header_str << std::endl;
-    // std::cout << "service_name: " << service_name << std::endl;
-    // std::cout << "method_name: " << method_name << std::endl;
-    // std::cout << "args_str: " << args_str << std::endl;
-
+    std::cout << "=========================" << std::endl;
+    std::cout << "header_size: " << header_size << std::endl;
+    std::cout << "rpc_header_str: " << rpc_header_str << std::endl;
+    std::cout << "service_name: " << service_name << std::endl;
+    std::cout << "method_name: " << method_name << std::endl;
+    std::cout << "args_str: " << args_str << std::endl;
+    std::cout << "send_rpc_str.size: " << send_rpc_str.size() << std::endl;
     // 使用tcp编程
     int clientfd = socket(AF_INET, SOCK_STREAM, 0);
     if (clientfd == -1) {
@@ -79,6 +81,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     // port =
     // atoi(MprpcApplication::GetInstance().GetConfig().Load("rpcserverip").c_str());
 
+    // TODO: 健康检测，负载均衡
     ZkClient zkCli;
     zkCli.Start();
     // /UserServiceRpc/Login
@@ -96,6 +99,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     }
     std::string ip = host_data.substr(0, idx);
 
+    // TODO： NAT_mode
     if (MprpcApplication::GetInstance().GetConfig().Load("NAT_mode") == "yes") {
         ip = MprpcApplication::GetInstance().GetConfig().Load("rpcserverip");
     }
@@ -128,7 +132,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         return;
     }
 
-    // ?不需要阻塞等待吗
+    // recv 函数是阻塞的
     // 接收rpc请求的响应值
     char recv_buf[4096] = {};
     int recv_size = 0;

@@ -262,12 +262,12 @@
                 return response.json(); // 将响应解析为 JSON
             })
             .then(data => {
-                if (data.state) {
-                    account_num = data.state;
-                    document.getElementById('dialog_message').textContent = "注册成功! 账号: "+data.state+", 是否直接登录?"
+                if (data.response_str) {
+                    account_num = data.response_str;
+                    document.getElementById('dialog_message').textContent = "注册成功! 账号: "+data.response_str+", 是否直接登录?"
                     customDialog.style.display = "flex"; // 显示对话框
                 } else {
-                    document.getElementById('errorMessage').textContent = data.state;
+                    document.getElementById('errorMessage').textContent = data.response_str;
                 }
             })
             .catch(error => {

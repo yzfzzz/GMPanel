@@ -1,3 +1,7 @@
+#include "config.h"
+#if RPC_TYPE_DEFINE == MPRPC
+#include "mprpcapplication.h"
+#endif
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <muduo/base/Logging.h>
@@ -45,7 +49,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
     std::string path = req.path();
     if (files_cache.find(path) != files_cache.end()) {
         resp->setStatusCode(HttpResponse::k200Ok);
-        resp->addHeader("Cache-Control", "public, max-age=60, immutable");
+        // resp->addHeader("Cache-Control", "public, max-age=60, immutable");
         resp->setStatusMessage("OK");
         resp->setContentType("text/html");
         resp->setBody(files_cache.find(path)->second);
@@ -71,7 +75,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
             resp->setStatusCode(HttpResponse::k200Ok);
             resp->setStatusMessage("OK");
             resp->setContentType("text/plain");
-            resp->setBody(query_data.toJsonStr());
+            resp->setBody(query_data.json_string);
         } else {
             resp->setStatusCode(HttpResponse::k400BadRequest);
             resp->setStatusMessage("Unauthorized");
@@ -94,7 +98,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
             resp->setStatusCode(HttpResponse::k200Ok);
             resp->setStatusMessage("OK");
             resp->setContentType("text/plain");
-            resp->setBody(user_manage.data.dump());
+            resp->setBody(user_manage.json_string);
         } else {
             resp->setStatusCode(HttpResponse::k400BadRequest);
             resp->setStatusMessage("Unauthorized");
@@ -123,7 +127,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
             resp->setStatusCode(HttpResponse::k200Ok);
             resp->setStatusMessage("OK");
             resp->setContentType("text/plain");
-            resp->setBody(user_manage.data.dump());
+            resp->setBody(user_manage.json_string);
         } else {
             resp->setStatusCode(HttpResponse::k400BadRequest);
             resp->setStatusMessage("Unauthorized");
@@ -143,7 +147,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp) {
     }
 }
 
-int main() {
+void yamlInit() {
     YAML::Node config = YAML::LoadFile("http_server_path.yaml");
     for (auto c : config["file"]) {
         std::string path = c.as<std::string>();
@@ -153,17 +157,29 @@ int main() {
         std::ifstream file("./resource" + path,
                            std::ios::in | std::ios::binary);
         if (!file) {
-            return -1;
+            return;
         }
         std::ostringstream content;
         content << file.rdbuf();
         file.close();
         files_cache[c.as<std::string>()] = content.str();
     }
+}
 
+void serverInit() {
+    yamlInit();
     EventLoop loop;
     HttpServer server(&loop, InetAddress("10.0.4.3", 80), "http_server");
     server.setHttpCallback(onRequest);
     server.start();
     loop.loop();
 }
+
+#if RPC_TYPE_DEFINE == MPRPC
+int main() {
+    MprpcApplication::Init(rpc_config_path);
+    serverInit();
+}
+#elif RPC_TYPE_DEFINE == GRPC
+int main() { serverInit(); }
+#endif

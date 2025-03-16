@@ -1,0 +1,201 @@
+2025-03-10 20:57:06,402 - root - INFO - This is python client of gmpanel
+2025-03-10 20:57:46,307 - root - INFO - This is python client of gmpanel
+2025-03-10 20:57:57,941 - root - INFO - This is python client of gmpanel
+2025-03-10 20:58:00,824 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 20:58:08,060 - root - INFO - This is python client of gmpanel
+2025-03-10 20:58:10,129 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 20:58:17,988 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 20:58:25,098 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 20:58:43,915 - root - INFO - This is python client of gmpanel
+2025-03-10 20:58:46,788 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 20:58:53,866 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 20:59:23,019 - root - INFO - This is python client of gmpanel
+2025-03-10 21:00:07,189 - root - INFO - This is python client of gmpanel
+2025-03-10 21:00:09,274 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 21:00:11,351 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 21:00:13,749 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 21:00:15,811 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 21:00:17,872 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 21:00:25,184 - root - INFO - This is python client of gmpanel
+2025-03-10 21:00:27,578 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 21:00:29,631 - root - ERROR - Error fetching GPU info: expected bytes, str found
+2025-03-10 21:00:36,222 - root - INFO - This is python client of gmpanel
+2025-03-10 21:00:40,188 - root - INFO - This is python client of gmpanel
+2025-03-10 21:00:43,935 - root - INFO - This is python client of gmpanel
+2025-03-10 21:01:32,868 - root - INFO - This is python client of gmpanel
+2025-03-10 21:02:01,610 - root - INFO - This is python client of gmpanel
+2025-03-11 16:48:01,093 - root - INFO - This is python client of gmpanel
+2025-03-11 16:48:26,561 - root - INFO - This is python client of gmpanel
+2025-03-11 16:48:48,296 - root - INFO - This is python client of gmpanel
+2025-03-11 16:56:47,502 - root - INFO - This is python client of gmpanel
+2025-03-11 16:56:50,211 - root - INFO - Successful call function!!!
+2025-03-11 16:56:52,258 - root - INFO - Successful call function!!!
+2025-03-11 16:56:54,307 - root - INFO - Successful call function!!!
+2025-03-11 16:56:56,360 - root - INFO - Successful call function!!!
+2025-03-11 16:56:58,425 - root - INFO - Successful call function!!!
+2025-03-11 16:57:00,671 - root - INFO - Successful call function!!!
+2025-03-11 16:57:02,737 - root - INFO - Successful call function!!!
+2025-03-11 16:57:04,798 - root - INFO - Successful call function!!!
+2025-03-11 16:57:06,867 - root - INFO - Successful call function!!!
+2025-03-11 16:57:08,927 - root - INFO - Successful call function!!!
+2025-03-11 16:57:11,010 - root - INFO - Successful call function!!!
+2025-03-11 16:57:13,067 - root - INFO - Successful call function!!!
+2025-03-11 16:57:15,131 - root - INFO - Successful call function!!!
+2025-03-11 16:57:17,185 - root - INFO - Successful call function!!!
+2025-03-11 16:57:19,233 - root - INFO - Successful call function!!!
+2025-03-11 16:57:21,289 - root - INFO - Successful call function!!!
+2025-03-11 16:57:23,346 - root - INFO - Successful call function!!!
+2025-03-11 16:57:25,397 - root - INFO - Successful call function!!!
+2025-03-11 16:57:27,458 - root - INFO - Successful call function!!!
+2025-03-11 16:57:29,510 - root - INFO - Successful call function!!!
+2025-03-11 16:57:31,756 - root - INFO - Successful call function!!!
+2025-03-11 16:57:33,816 - root - INFO - Successful call function!!!
+2025-03-11 16:57:35,867 - root - INFO - Successful call function!!!
+2025-03-11 16:57:37,919 - root - INFO - Successful call function!!!
+2025-03-11 16:57:39,979 - root - INFO - Successful call function!!!
+2025-03-11 16:57:42,035 - root - INFO - Successful call function!!!
+2025-03-11 16:57:44,093 - root - INFO - Successful call function!!!
+2025-03-11 16:57:46,167 - root - INFO - Successful call function!!!
+2025-03-11 16:57:48,217 - root - INFO - Successful call function!!!
+2025-03-11 16:57:50,273 - root - INFO - Successful call function!!!
+2025-03-11 16:57:52,313 - root - INFO - Successful call function!!!
+2025-03-11 16:57:54,368 - root - INFO - Successful call function!!!
+2025-03-11 16:57:56,424 - root - INFO - Successful call function!!!
+2025-03-11 16:57:58,680 - root - INFO - Successful call function!!!
+2025-03-11 16:58:00,735 - root - INFO - Successful call function!!!
+2025-03-11 16:58:02,783 - root - INFO - Successful call function!!!
+2025-03-11 16:58:04,851 - root - INFO - Successful call function!!!
+2025-03-11 17:15:28,782 - root - INFO - This is python client of gmpanel
+2025-03-11 17:15:30,995 - root - INFO - Successful call function!!!
+2025-03-11 17:15:33,041 - root - INFO - Successful call function!!!
+2025-03-11 17:15:35,101 - root - INFO - Successful call function!!!
+2025-03-11 17:15:37,154 - root - INFO - Successful call function!!!
+2025-03-11 17:15:39,200 - root - INFO - Successful call function!!!
+2025-03-11 17:15:41,249 - root - INFO - Successful call function!!!
+2025-03-11 17:15:43,317 - root - INFO - Successful call function!!!
+2025-03-11 17:15:45,372 - root - INFO - Successful call function!!!
+2025-03-11 17:15:47,421 - root - INFO - Successful call function!!!
+2025-03-11 17:15:49,480 - root - INFO - Successful call function!!!
+2025-03-11 17:15:51,529 - root - INFO - Successful call function!!!
+2025-03-11 17:15:53,583 - root - INFO - Successful call function!!!
+2025-03-11 17:15:55,646 - root - INFO - Successful call function!!!
+2025-03-11 17:15:57,715 - root - INFO - Successful call function!!!
+2025-03-11 17:15:59,769 - root - INFO - Successful call function!!!
+2025-03-11 17:16:01,833 - root - INFO - Successful call function!!!
+2025-03-11 17:16:03,893 - root - INFO - Successful call function!!!
+2025-03-11 17:16:05,941 - root - INFO - Successful call function!!!
+2025-03-11 17:16:07,999 - root - INFO - Successful call function!!!
+2025-03-11 17:16:10,049 - root - INFO - Successful call function!!!
+2025-03-11 17:16:12,093 - root - INFO - Successful call function!!!
+2025-03-11 17:16:14,151 - root - INFO - Successful call function!!!
+2025-03-11 17:16:16,215 - root - INFO - Successful call function!!!
+2025-03-11 17:16:18,266 - root - INFO - Successful call function!!!
+2025-03-11 17:16:20,315 - root - INFO - Successful call function!!!
+2025-03-11 17:16:22,379 - root - INFO - Successful call function!!!
+2025-03-11 17:16:24,443 - root - INFO - Successful call function!!!
+2025-03-11 17:16:26,506 - root - INFO - Successful call function!!!
+2025-03-11 17:16:28,553 - root - INFO - Successful call function!!!
+2025-03-11 17:16:30,598 - root - INFO - Successful call function!!!
+2025-03-11 17:16:32,645 - root - INFO - Successful call function!!!
+2025-03-11 17:16:34,706 - root - INFO - Successful call function!!!
+2025-03-11 17:16:36,815 - root - INFO - Successful call function!!!
+2025-03-11 17:16:38,863 - root - INFO - Successful call function!!!
+2025-03-11 17:16:40,926 - root - INFO - Successful call function!!!
+2025-03-11 17:16:42,985 - root - INFO - Successful call function!!!
+2025-03-11 17:16:45,033 - root - INFO - Successful call function!!!
+2025-03-11 17:16:47,093 - root - INFO - Successful call function!!!
+2025-03-11 17:16:49,151 - root - INFO - Successful call function!!!
+2025-03-11 17:16:51,211 - root - INFO - Successful call function!!!
+2025-03-11 17:16:53,276 - root - INFO - Successful call function!!!
+2025-03-11 17:16:55,336 - root - INFO - Successful call function!!!
+2025-03-11 17:16:57,399 - root - INFO - Successful call function!!!
+2025-03-11 17:16:59,454 - root - INFO - Successful call function!!!
+2025-03-11 17:17:01,505 - root - INFO - Successful call function!!!
+2025-03-11 17:17:03,557 - root - INFO - Successful call function!!!
+2025-03-11 17:17:05,604 - root - INFO - Successful call function!!!
+2025-03-11 17:17:07,662 - root - INFO - Successful call function!!!
+2025-03-11 17:17:09,708 - root - INFO - Successful call function!!!
+2025-03-11 17:17:11,761 - root - INFO - Successful call function!!!
+2025-03-11 17:17:13,821 - root - INFO - Successful call function!!!
+2025-03-11 17:17:15,864 - root - INFO - Successful call function!!!
+2025-03-11 17:17:17,905 - root - INFO - Successful call function!!!
+2025-03-11 17:17:19,964 - root - INFO - Successful call function!!!
+2025-03-11 17:17:22,017 - root - INFO - Successful call function!!!
+2025-03-11 17:17:24,062 - root - INFO - Successful call function!!!
+2025-03-11 17:17:26,109 - root - INFO - Successful call function!!!
+2025-03-11 17:17:28,166 - root - INFO - Successful call function!!!
+2025-03-11 17:17:30,220 - root - INFO - Successful call function!!!
+2025-03-11 17:17:32,279 - root - INFO - Successful call function!!!
+2025-03-11 17:17:34,334 - root - INFO - Successful call function!!!
+2025-03-11 17:17:36,395 - root - INFO - Successful call function!!!
+2025-03-11 17:17:38,447 - root - INFO - Successful call function!!!
+2025-03-11 17:17:40,497 - root - INFO - Successful call function!!!
+2025-03-11 17:17:42,544 - root - INFO - Successful call function!!!
+2025-03-11 17:17:44,619 - root - INFO - Successful call function!!!
+2025-03-11 17:17:46,671 - root - INFO - Successful call function!!!
+2025-03-11 17:17:48,721 - root - INFO - Successful call function!!!
+2025-03-11 17:17:50,772 - root - INFO - Successful call function!!!
+2025-03-11 17:17:52,821 - root - INFO - Successful call function!!!
+2025-03-11 17:17:54,877 - root - INFO - Successful call function!!!
+2025-03-11 17:17:56,939 - root - INFO - Successful call function!!!
+2025-03-11 17:17:58,989 - root - INFO - Successful call function!!!
+2025-03-11 17:18:01,046 - root - INFO - Successful call function!!!
+2025-03-11 17:18:03,099 - root - INFO - Successful call function!!!
+2025-03-11 17:18:05,149 - root - INFO - Successful call function!!!
+2025-03-11 17:18:07,205 - root - INFO - Successful call function!!!
+2025-03-11 17:18:09,260 - root - INFO - Successful call function!!!
+2025-03-11 17:18:11,313 - root - INFO - Successful call function!!!
+2025-03-11 17:18:13,378 - root - INFO - Successful call function!!!
+2025-03-11 17:18:15,415 - root - INFO - Successful call function!!!
+2025-03-11 17:18:17,469 - root - INFO - Successful call function!!!
+2025-03-11 17:18:19,523 - root - INFO - Successful call function!!!
+2025-03-11 17:18:21,570 - root - INFO - Successful call function!!!
+2025-03-11 17:18:23,628 - root - INFO - Successful call function!!!
+2025-03-11 17:18:25,669 - root - INFO - Successful call function!!!
+2025-03-11 17:18:27,723 - root - INFO - Successful call function!!!
+2025-03-11 17:18:29,773 - root - INFO - Successful call function!!!
+2025-03-11 17:18:31,824 - root - INFO - Successful call function!!!
+2025-03-11 17:18:33,871 - root - INFO - Successful call function!!!
+2025-03-11 17:18:35,926 - root - INFO - Successful call function!!!
+2025-03-11 17:18:37,967 - root - INFO - Successful call function!!!
+2025-03-11 17:18:40,018 - root - INFO - Successful call function!!!
+2025-03-11 17:18:42,082 - root - INFO - Successful call function!!!
+2025-03-11 17:18:44,130 - root - INFO - Successful call function!!!
+2025-03-11 17:18:46,182 - root - INFO - Successful call function!!!
+2025-03-11 17:18:48,234 - root - INFO - Successful call function!!!
+2025-03-11 17:18:50,290 - root - INFO - Successful call function!!!
+2025-03-11 17:18:52,359 - root - INFO - Successful call function!!!
+2025-03-11 17:18:54,408 - root - INFO - Successful call function!!!
+2025-03-11 17:18:56,459 - root - INFO - Successful call function!!!
+2025-03-11 17:18:58,517 - root - INFO - Successful call function!!!
+2025-03-11 19:37:12,712 - root - INFO - This is python client of gmpanel
+2025-03-11 19:38:29,421 - root - INFO - This is python client of gmpanel
+2025-03-11 19:38:31,511 - root - INFO - Connection failed, find error: [WinError 10061] 由于目标计算机积极拒绝，无法连接。!!!
+2025-03-11 19:38:33,604 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:35,660 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:37,713 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:40,202 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:42,246 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:44,299 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:46,350 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:48,395 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:50,879 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:52,936 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:54,981 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:57,035 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:38:59,090 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:39:01,146 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:39:03,209 - root - INFO - Fail call function, find error: 'RpcClient' object has no attribute 'service_name'!!!
+2025-03-11 19:39:32,447 - root - INFO - This is python client of gmpanel
+2025-03-11 19:39:34,518 - root - INFO - Connection failed, find error: [WinError 10061] 由于目标计算机积极拒绝，无法连接。!!!
+2025-03-11 19:39:36,598 - root - INFO - Fail call function, find error: [WinError 10057] 由于套接字没有连接并且(当使用一个 sendto 调用发送数据报套接字时)没有提供地址，发送或接收数据的请求没有被接受。!!!
+2025-03-11 19:39:39,087 - root - INFO - Fail call function, find error: [WinError 10057] 由于套接字没有连接并且(当使用一个 sendto 调用发送数据报套接字时)没有提供地址，发送或接收数据的请求没有被接受。!!!
+2025-03-11 19:39:41,202 - root - INFO - Fail call function, find error: [WinError 10057] 由于套接字没有连接并且(当使用一个 sendto 调用发送数据报套接字时)没有提供地址，发送或接收数据的请求没有被接受。!!!
+2025-03-11 19:39:43,261 - root - INFO - Fail call function, find error: [WinError 10057] 由于套接字没有连接并且(当使用一个 sendto 调用发送数据报套接字时)没有提供地址，发送或接收数据的请求没有被接受。!!!
+2025-03-11 19:39:51,810 - root - INFO - This is python client of gmpanel
+2025-03-11 19:39:53,875 - root - INFO - Connection failed, find error: {e}!!!
+2025-03-11 19:39:56,259 - root - INFO - Fail call function, find error: [WinError 10057] 由于套接字没有连接并且(当使用一个 sendto 调用发送数据报套接字时)没有提供地址，发送或接收数据的请求没有被接受。!!!
+2025-03-11 19:39:58,400 - root - INFO - Fail call function, find error: [WinError 10057] 由于套接字没有连接并且(当使用一个 sendto 调用发送数据报套接字时)没有提供地址，发送或接收数据的请求没有被接受。!!!
+2025-03-11 19:40:00,448 - root - INFO - Fail call function, find error: [WinError 10057] 由于套接字没有连接并且(当使用一个 sendto 调用发送数据报套接字时)没有提供地址，发送或接收数据的请求没有被接受。!!!
+2025-03-11 19:40:02,503 - root - INFO - Fail call function, find error: [WinError 10057] 由于套接字没有连接并且(当使用一个 sendto 调用发送数据报套接字时)没有提供地址，发送或接收数据的请求没有被接受。!!!
+2025-03-11 19:40:04,564 - root - INFO - Fail call function, find error: [WinError 10057] 由于套接字没有连接并且(当使用一个 sendto 调用发送数据报套接字时)没有提供地址，发送或接收数据的请求没有被接受。!!!

@@ -179,7 +179,6 @@ if __name__ == '__main__':
 
         except grpc.RpcError as e:
             logging.error(f"Error fetching GPU info: {e}")
-            #  长时间无响应时，服务器会进行四次挥手，TCP断开，因此需要重新建立channel进行重连
             rpc_client = None
             rpc_client = RpcClient("124.223.141.236:50051")
         time.sleep(5)

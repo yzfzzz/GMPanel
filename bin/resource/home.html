@@ -354,6 +354,7 @@
     <script>
 
         // JavaScript 逻辑
+        var cur_option;
         const customDialog = document.getElementById("customDialog");
         const confirmBtn = document.getElementById("confirmBtn");
         // 确认按钮点击事件
@@ -405,8 +406,9 @@
                 document.getElementById('hard_diskUsageBar-text').textContent = `${percent.toFixed(2)}%`;
             },
             setCpu_Each_Core_UesdChart: (usage) => {
-                cpu_core_Chart.data.datasets[0].data = usage;
-                cpu_core_Chart.data.labels = usage.map((_, index) => `核心 ${index + 1}`),
+                const t = JSON.parse(usage)
+                cpu_core_Chart.data.datasets[0].data = t;
+                cpu_core_Chart.data.labels = t.map((_, index) => `核心 ${index + 1}`),
                 cpu_core_Chart.update();
             },
             setNetUpLoad: (usage) => {
@@ -426,11 +428,27 @@
                 const gpuDropdown = document.getElementById('gpuDropdown');
                 gpuDropdown.innerHTML = '';
                 for (const machine of usage) {
+                    var machine_name;
                     const option = document.createElement('option');
-                    option.value = machine;
-                    option.textContent = machine;
+                    if(machine.machine_name == undefined)
+                    {
+                        machine_name = machine;
+                        option.textContent = "💻️"+machine_name;
+                    }
+                    else{
+                        machine_name = machine.machine_name;
+                        const last_update_time = machine.last_update_time;
+                        option.textContent = "💻️"+machine_name+" 🕗"+last_update_time;
+                    }
+                    if(cur_option == undefined)
+                    {
+                        cur_option = machine_name;
+                    }
+                    option.value = machine_name;
                     gpuDropdown.appendChild(option);
                 }
+                console.log(cur_option);
+                document.getElementById('gpuDropdown').value = cur_option;
             },
             setGpuTable: (gpu_id,gpu_name,gpu_used_mem,gpu_total_mem,gpu_mem_utilize,gpu_temperture) => {
                 const tbody = document.querySelector('#gpuTable tbody');
@@ -453,6 +471,7 @@
 
         // 定时获取服务器数据
         const fetchServerData = (endpoint = '/data') => {
+
                 const params = {account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value };
                 if(!document.getElementById('gpuDropdown').value)
                 {
@@ -499,8 +518,8 @@
                     }
 
                     // 内存
-                    if (data.mem_used_percent !== undefined && data.mem_total !== undefined && data.mem_avail!== undefined) {
-                        updateData.setMemUsage(data.mem_total,data.mem_avail,data.mem_used_percent);
+                    if (data.mem_total !== undefined && data.mem_avail!== undefined) {
+                        updateData.setMemUsage(data.mem_total,data.mem_avail,100*(data.mem_total-data.mem_avail)/data.mem_total);
                     }
 
                     // 磁盘
@@ -509,22 +528,33 @@
                     }
 
                     // 网络
-                    if (data.net_send_rate_array !== undefined) {
-                        updateData.setNetUpLoad(data.net_send_rate_array.reverse());
+                    if (data.net_send_rate !== undefined) {
+                        updateData.setNetUpLoad(data.net_send_rate.reverse());
                     }
-                    if (data.net_rcv_rate_array !== undefined) {
-                        updateData.setNetDownLoad(data.net_rcv_rate_array.reverse());
+                    if (data.net_rcv_rate !== undefined) {
+                        updateData.setNetDownLoad(data.net_rcv_rate.reverse());
                     }
 
                     // 时间
-                    if (data.timehms_array !== undefined) {
-                        updateData.setTime(data.timehms_array.reverse());
+                    if (data.timehms !== undefined) {
+                        updateData.setTime(data.timehms.reverse());
                     }
 
                     // 显卡数组
                     if(data.gpu_name !== undefined && data.gpu_id !== undefined && data.gpu_used_mem !== undefined && data.gpu_total_mem !== undefined && data.gpu_mem_utilize !== undefined && data.gpu_temperture !== undefined)
                     {
-                        updateData.setGpuTable(data.gpu_id,data.gpu_name,data.gpu_used_mem,data.gpu_total_mem,data.gpu_mem_utilize,data.gpu_temperture);
+                        const gpu_name = JSON.parse(data.gpu_name)
+                        const gpu_id = JSON.parse(data.gpu_id)
+                        const gpu_used_mem = JSON.parse(data.gpu_used_mem)
+                        const gpu_total_mem = JSON.parse(data.gpu_total_mem)
+                        const gpu_mem_utilize = JSON.parse(data.gpu_mem_utilize)
+                        const gpu_temperture = JSON.parse(data.gpu_temperture)
+                        updateData.setGpuTable(gpu_id,gpu_name,gpu_used_mem,gpu_total_mem,gpu_mem_utilize,gpu_temperture);
+                    }
+
+                    if(data.machine_status !== undefined)
+                    {
+                        updateData.setMachine(data.machine_status);
                     }
                 })
                 .catch(error => {
@@ -532,17 +562,20 @@
 
                 });
         };
-
-        const cookie_json = JSON.parse(document.cookie);
-        updateData.setUserInfo(cookie_json.account_num);
-        updateData.setMachine(cookie_json.machine_name);
-        console.log(document.getElementById('userInfo').textContent);
-        console.log(document.getElementById('gpuDropdown').value);
-        console.log({account_num: document.getElementById('userInfo').textContent, machine_name:  document.getElementById('gpuDropdown').value });
+        var json_data_str;
+        const hash = window.location.hash.substring(1); // 去掉#号
+        if (hash.length > 0) {
+            console.log("hello");
+            const urlParams = new URLSearchParams(hash);
+            json_data_str= decodeURIComponent(urlParams.get('data')); // 解码消息
+        }
+        const json_data = JSON.parse(json_data_str);
+        updateData.setUserInfo(json_data.account_num);
+        updateData.setMachine(json_data.machine_name_array);
         fetchServerData('/data');
         // 下拉框事件监听
         gpuDropdown.addEventListener('change', function () {
-            const selectedMachine = document.getElementById('gpuDropdown').value;
+            cur_option = document.getElementById('gpuDropdown').value;
             fetchServerData('/data');
         });
         // CPU 使用率图表
@@ -634,7 +667,7 @@
     </script>
      <!-- 添加跳转到GitHub的链接 -->
      <footer style="text-align: center; margin-top: 20px;">
-        <a href="https://github.com/yzfzzz/GMPanel/tree/develop" target="_blank">📔欢迎访问GitHub仓库</a>
+        <a href="https://github.com/yzfzzz/GMPanel" target="_blank">📔欢迎访问GitHub仓库</a>
     </footer>
 </body>
 </html>
