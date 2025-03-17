@@ -61,7 +61,7 @@ class ServerManagerImpl : public monitor::proto::MonitorManager::Service
                       std::shared_ptr<MysqlConn> conn_ptr);
     bool isMachineExist(std::string user_id, std::string machine_name);
 
-    bool updateMachineStatus(std::string machine_name);
+    bool updateMachineStatus(std::string user_id, std::string machine_name);
 
     std::string formatDate(const std::string& datetime) {
         if (datetime.empty()) {
