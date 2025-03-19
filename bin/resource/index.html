@@ -248,6 +248,11 @@
                 if (data.response_str === 'login successful') {
                     const account_num=  document.getElementById("usernameInput").value;
                     const machine_name = data.machine_name_array;
+                    if(machine_name.length === 0)
+                    {
+                        alert("当前账号没有注册机器!!!");
+                        return;
+                    }
                     const json_data = {
                         account_num: account_num,
                         machine_name_array: data.machine_name_array

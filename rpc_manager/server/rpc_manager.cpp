@@ -109,30 +109,9 @@ bool ServerManagerImpl::queryDataInfo(
             machine_status->set_machine_name(conn_ptr->value(0));
             machine_status->set_last_update_time(conn_ptr->value(1));
         }
-    } else {
+    } else { 
         return false;
     }
-    // 查询机器是否超1个小时没更新了，如果没更新就返回空
-    // sql = fmt::format(
-    //     "SELECT
-    //     IF(TIMESTAMPDIFF(
-    //            HOUR, NOW(),
-    //            (SELECT last_update_time FROM machine m WHERE machine_name =
-    //                 '{}' AND user_id =
-    //                     (SELECT id from `user` u WHERE accountnum = '{}'))) >
-    //                     1,
-    //        FALSE, TRUE) AS result ",
-    //     machine_name,
-    //     accountnum);
-    // bool flag;
-    // if (conn_ptr->query(sql) == true) {
-    //     while (conn_ptr->next()) {
-    //         flag = stoi(conn_ptr->value(0));
-    //     }
-    // }
-    // if (!flag) {
-    //     return false;
-    // }
     std::string table_name = "table_" + machine_map[machine_name];
     sql = fmt::format(sql_book["select_all_metrics_sql"].as<std::string>(),
                       table_name, machine_name, accountnum);
@@ -277,7 +256,7 @@ bool ServerManagerImpl::insertOneInfo(
     LOG(INFO) << "InsertOneInfo SQL: " << sql;
     if (conn_ptr->update(sql)) {
         LOG(INFO) << "Succeed to insert one sql";
-        if (updateMachineStatus(mid_info.machine_name)) {
+        if (updateMachineStatus(user_id, mid_info.machine_name)) {
             return true;
         }
     }
@@ -285,12 +264,12 @@ bool ServerManagerImpl::insertOneInfo(
     return false;
 }
 
-bool ServerManagerImpl::updateMachineStatus(std::string machine_name) {
+bool ServerManagerImpl::updateMachineStatus(std::string user_id, std::string machine_name) {
     std::shared_ptr<MysqlConn> conn_ptr = this->pool->getConnection();
     std::string sql = fmt::format(
         "UPDATE machine SET last_update_time = (SELECT NOW()) where "
-        "machine_name = '{}'",
-        machine_name);
+        "machine_name = '{}' and user_id = {}",
+        machine_name, user_id);
     if (conn_ptr->update(sql)) {
         return true;
     }
