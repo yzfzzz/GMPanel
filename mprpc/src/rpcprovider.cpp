@@ -73,19 +73,20 @@ void RpcProvider::Run() {
         for (auto& mp : sp.second.m_methodMap) {
             // /service_name/method_name    /UserServiceRpc/Login
             std::string method_path = service_path + "/" + mp.first;
-            char method_path_data[128] = {0};
-            // 存储当前这个rpc主机的ip和port
-            // TODO: 在内网和公网的情况下，zookeeper的节点信息错误
-            sprintf(method_path_data, "%s:%d", public_network_ip.c_str(), port);
-            zkCli.Create(method_path.c_str(), method_path_data,
-                         strlen(method_path_data),
+            zkCli.Create(method_path.c_str(), nullptr, 0);
+            char host_path[128] = {0};
+            // 存储当前这个rpc主机的ip和port, 作为一个子节点
+            // /UserServiceRpc/Login/182.168.1.1:80
+            sprintf(host_path, "%s:%d", public_network_ip.c_str(), port);
+            std::string node_path = method_path + "/" + host_path;
+            zkCli.Create(node_path.c_str(), nullptr, 0,
                          ZOO_EPHEMERAL);  // ZOO_EPHEMERAL表示临时性节点
         }
     }
 
     // rpc服务端准备启动, 打印信息
-    std::cout << "RpcProvider start service at ip:" << public_network_ip << " port:" << port
-              << std::endl;
+    std::cout << "RpcProvider start service at ip:" << public_network_ip
+              << " port:" << port << std::endl;
 
     // 启动网络服务
     server.start();

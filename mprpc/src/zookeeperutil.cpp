@@ -92,3 +92,19 @@ std::string ZkClient::GetData(const char* path) {
         return buffer;
     }
 }
+
+std::vector<std::string> ZkClient::GetChildren(const char* path) {
+    String_vector children;
+    int flag = zoo_get_children(m_zhandle, path, 0, &children);
+    if(flag != ZOK)
+    {
+        std::cout << "get children error... path:" << path << std::endl;
+        return std::vector<std::string>();
+    }
+    std::vector<std::string> v;
+    for(int i = 0; i < children.count; ++i)
+    {
+        v.push_back(children.data[i]);
+    }
+    return v;
+}
