@@ -17,7 +17,9 @@ void MprpcApplication::Init(std::string config_path) {
     zookeeper_port
     */
     m_config.LoadConfigFile(config_path);
-    std::cout << "rpcserverip = " << m_config.Load("rpcserverip") << std::endl;
+    std::cout << "public_network_ip = " << m_config.Load("public_network_ip") << std::endl;
+        std::cout << "private_network_ip = " << m_config.Load("private_network_ip") << std::endl;
+    
     std::cout << "rpcserverport = " << m_config.Load("rpcserverport")
               << std::endl;
     std::cout << "zookeeperip = " << m_config.Load("zookeeperip") << std::endl;

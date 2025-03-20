@@ -1,4 +1,5 @@
-rpcserverip: 10.0.4.3
+public_network_ip: 124.223.141.236
+private_network_ip: 10.0.4.3
 rpcserverport: 50051
 zookeeperip: 10.0.4.3
 zookeeperport: 2181
