@@ -36,13 +36,13 @@ void RpcProvider::NotifyService(google::protobuf::Service* service) {
 }
 
 void RpcProvider::Run() {
-    std::string ip =
-        MprpcApplication::GetInstance().GetConfig().Load("rpcserverip");
+    std::string private_network_ip =
+        MprpcApplication::GetInstance().GetConfig().Load("private_network_ip");
     uint16_t port = atoi(MprpcApplication::GetInstance()
                              .GetConfig()
                              .Load("rpcserverport")
                              .c_str());
-    muduo::net::InetAddress address(ip, port);
+    muduo::net::InetAddress address(private_network_ip, port);
 
     // ------------------------muduo------------------------------------
     // 启动Tcp Server
@@ -61,6 +61,8 @@ void RpcProvider::Run() {
 
     // 把当前rpc节点上要发布的服务全部注册到zk上面, 让rpc
     // client可以从zk上发现服务
+    std::string public_network_ip =
+        MprpcApplication::GetInstance().GetConfig().Load("public_network_ip");
     ZkClient zkCli;
     zkCli.Start();
     // service_name为永久性节点, method为临时性节点
@@ -71,19 +73,20 @@ void RpcProvider::Run() {
         for (auto& mp : sp.second.m_methodMap) {
             // /service_name/method_name    /UserServiceRpc/Login
             std::string method_path = service_path + "/" + mp.first;
-            char method_path_data[128] = {0};
-            // 存储当前这个rpc主机的ip和port
-            // TODO: 在内网和公网的情况下，zookeeper的节点信息错误
-            sprintf(method_path_data, "%s:%d", ip.c_str(), port);
-            zkCli.Create(method_path.c_str(), method_path_data,
-                         strlen(method_path_data),
+            zkCli.Create(method_path.c_str(), nullptr, 0);
+            char host_path[128] = {0};
+            // 存储当前这个rpc主机的ip和port, 作为一个子节点
+            // /UserServiceRpc/Login/182.168.1.1:80
+            sprintf(host_path, "%s:%d", public_network_ip.c_str(), port);
+            std::string node_path = method_path + "/" + host_path;
+            zkCli.Create(node_path.c_str(), nullptr, 0,
                          ZOO_EPHEMERAL);  // ZOO_EPHEMERAL表示临时性节点
         }
     }
 
     // rpc服务端准备启动, 打印信息
-    std::cout << "RpcProvider start service at ip:" << ip << " port:" << port
-              << std::endl;
+    std::cout << "RpcProvider start service at ip:" << public_network_ip
+              << " port:" << port << std::endl;
 
     // 启动网络服务
     server.start();

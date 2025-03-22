@@ -1,4 +1,3 @@
-#include "mprpcchannel.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -8,6 +7,7 @@
 #include <iomanip>  // 用于格式化输出
 #include <sstream>  // 用于字符串流操作
 #include "mprpcapplication.h"
+#include "mprpcchannel.h"
 #include "rpcheader.pb.h"
 #include "zookeeperutil.h"
 
@@ -76,18 +76,20 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         return;
     }
 
-    // std::string ip =
-    // MprpcApplication::GetInstance().GetConfig().Load("rpcserverip"); uint16_t
-    // port =
-    // atoi(MprpcApplication::GetInstance().GetConfig().Load("rpcserverip").c_str());
-
     // TODO: 健康检测，负载均衡
     ZkClient zkCli;
     zkCli.Start();
     // /UserServiceRpc/Login
     std::string method_path = "/" + service_name + "/" + method_name;
     // 127.0.0.1:8000
-    std::string host_data = zkCli.GetData(method_path.c_str());
+    std::vector<std::string> host_array =
+        zkCli.GetChildren(method_path.c_str());
+
+    // 负载均衡
+    std::string host_data;
+    host_data = (*p_load_balancer)(host_array);
+    std::cout << "HOST DATA: " << host_data << std::endl;
+    // std::string host_data = host_array[0];
     if (host_data == "") {
         controller->SetFailed(method_path + " is not exist!");
         return;
