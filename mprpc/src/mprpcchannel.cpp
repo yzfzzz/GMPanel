@@ -87,6 +87,11 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
 
     // 负载均衡
     std::string host_data;
+    if(host_array.size() == 0)
+    {
+        controller->SetFailed(method_path + " address is invalid!");
+        return;
+    }
     host_data = (*p_load_balancer)(host_array);
     std::cout << "HOST DATA: " << host_data << std::endl;
     // std::string host_data = host_array[0];
