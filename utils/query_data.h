@@ -18,6 +18,7 @@ class QueryData {
     std::string json_string;
     std::string account_num;
     std::string machine_name;
+    monitor::RpcClient rpc_client;
 };
 
 class UserManage {
@@ -28,6 +29,7 @@ class UserManage {
     std::string json_string;
     std::string response_str;
     std::vector<std::string> machine_name_array;
+    monitor::RpcClient rpc_client;
 };
 
 }  // namespace monitor

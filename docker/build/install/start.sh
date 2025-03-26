@@ -13,4 +13,5 @@ export TZ=Asia/Shanghai
 cp -r /home/work/docker/build/install/fonts/* /usr/share/fonts/
 apt-get -y install fontconfig xfonts-utils
 apt-get install libfmt-dev
+apt install libyaml-cpp-dev
 fc-cache -f -v
