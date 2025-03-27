@@ -66,6 +66,8 @@ qt客户端界面<br>
 
 ## 怎么用？
 ### 快速使用
+**🏝️新用户使用之前需要注册账号**，网页端访问地址：http://124.223.141.236/: 
+ - https://www.bilibili.com/video/BV1LNR8YWEYY
 1. 点击[下载文件](https://github.com/yzfzzz/GMPanel/releases/tag/v0.8.1)，解压到服务器任意目录<br>
 ![快速使用1](./doc/img/快速使用1.png)<br>
 2. 修改配置文件config.yaml，修改账号，机器名自定义
@@ -81,9 +83,6 @@ qt客户端界面<br>
     ```shell
     ./gmpanel_client
     ```
-
-**🏝️新用户使用之前需要注册账号**，网页端访问地址：http://124.223.141.236/: 
- - https://www.bilibili.com/video/BV1LNR8YWEYY
 
 ### 自己搭建服务
 建议使用我提供的云服务器
