@@ -82,9 +82,9 @@ qt客户端界面<br>
     ./gmpanel_client
     ```
 
-b站演示: 
+**🏝️新用户使用之前需要注册账号**，教程: 
  - https://www.bilibili.com/video/BV1LNR8YWEYY
- - https://www.bilibili.com/video/BV1iqqNYCEv8
+
 ### 自己搭建服务
 建议使用我提供的云服务器
 
