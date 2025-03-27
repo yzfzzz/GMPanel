@@ -18,7 +18,6 @@ bool proto_to_json(const google::protobuf::Message& message,
 namespace monitor {
 bool QueryData::queryDataInfo(std::string account_num,
                               std::string machine_name) {
-    monitor::RpcClient rpc_client;
     this->account_num = account_num;
     this->machine_name = machine_name;
     GetCurTime cur_time;
@@ -40,7 +39,6 @@ bool QueryData::queryDataInfo(std::string account_num,
 }
 
 bool UserManage::login(std::string account_num, std::string pwd) {
-    monitor::RpcClient rpc_client;
     monitor::proto::UserMessage request;
     monitor::proto::UserResponseMessage response;
     request.set_account_num(account_num);
@@ -55,7 +53,6 @@ bool UserManage::login(std::string account_num, std::string pwd) {
 
 bool UserManage::signup(std::string pwd) {
     std::string account_num;
-    monitor::RpcClient rpc_client;
     monitor::proto::UserMessage request;
     monitor::proto::UserResponseMessage response;
     request.set_account_num(account_num);

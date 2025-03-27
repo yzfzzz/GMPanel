@@ -9,6 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include "google/protobuf/service.h"
+#include "tokenbucket.h"
 
 // 框架提供的专门服务发布rpc服务的网络对象类
 class RpcProvider {
@@ -23,6 +24,7 @@ class RpcProvider {
    private:
     // 组合EventLoop
     muduo::net::EventLoop m_eventLoop;
+    TokenBucket m_tokenBucket;
 
     // service服务类型信息
     struct ServiceInfo {

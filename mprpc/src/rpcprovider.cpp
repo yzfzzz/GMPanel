@@ -113,6 +113,11 @@ void RpcProvider::OnConnection(const muduo::net::TcpConnectionPtr& conn) {
 // 那么OnMessage方法会响应 ==> 黄色部分
 void RpcProvider::OnMessage(const muduo::net::TcpConnectionPtr& conn,
                             muduo::net::Buffer* buffer, muduo::Timestamp) {
+    if(!m_tokenBucket.consume(1))
+    {
+        return;
+    }
+    
     // 网络上接收的远程rpc调用请求的字符流
     std::string recv_buf = buffer->retrieveAllAsString();
 

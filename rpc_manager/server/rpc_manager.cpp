@@ -1,8 +1,8 @@
-#include "rpc_manager.h"
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <iostream>
 #include "get_time.h"
+#include "rpc_manager.h"
 namespace monitor {
 
 enum SystemMetrics {
@@ -42,7 +42,6 @@ void ServerManagerImpl::SetMonitorInfo(
     const ::monitor::proto::MonitorInfo* request,
     ::google::protobuf::Empty* response, ::google::protobuf::Closure* done) {
     std::lock_guard<std::mutex> lock(set_mutex_);
-    LOG(INFO) << "RPC Call: ServerManagerImpl::SetMonitorInfo";
     monitor_infos_.Clear();
     monitor_infos_ = *request;
     insertOneInfo(monitor_infos_);
@@ -68,7 +67,6 @@ void ServerManagerImpl::GetMonitorInfo(
     ::monitor::proto::QueryResults* response,
     ::google::protobuf::Closure* done) {
     std::lock_guard<std::mutex> lock(get_mutex_);
-    LOG(INFO) << "RPC Call: ServerManagerImpl::GetMonitorInfo";
     queryDataInfo(request, response);
     done->Run();
 }
@@ -96,26 +94,22 @@ bool ServerManagerImpl::queryDataInfo(
     std::shared_ptr<MysqlConn> conn_ptr = this->pool->getConnection();
     std::string sql;
     std::map<std::string, std::string> machine_map;
-    LOG(INFO) << "ServerManagerImpl::queryDataInfo";
     // 查询机器状态
     sql = fmt::format(sql_book["search_machine_status_sql"].as<std::string>(),
                       accountnum);
     if (conn_ptr->query(sql) == true) {
         while (conn_ptr->next()) {
-            LOG(INFO) << "search_machine_status: " << conn_ptr->value(0) << " "
-                      << conn_ptr->value(1);
             machine_map[conn_ptr->value(0)] = formatDate(conn_ptr->value(1));
             auto machine_status = response->add_machine_status();
             machine_status->set_machine_name(conn_ptr->value(0));
             machine_status->set_last_update_time(conn_ptr->value(1));
         }
-    } else { 
+    } else {
         return false;
     }
     std::string table_name = "table_" + machine_map[machine_name];
     sql = fmt::format(sql_book["select_all_metrics_sql"].as<std::string>(),
                       table_name, machine_name, accountnum);
-    // LOG(INFO) << "sql: " << sql;
     if (conn_ptr->query(sql) == true) {
         while (conn_ptr->next()) {
             response->set_machine_name(conn_ptr->value(MACHINE_NAME));
@@ -170,7 +164,6 @@ bool ServerManagerImpl::queryDataInfo(
 
 MidInfo ServerManagerImpl::parseInfos(
     monitor::proto::MonitorInfo& monitor_infos_) {
-    LOG(INFO) << "Parse monitor_infos_...";
     MidInfo mid_info;
     // 用户信息
     mid_info.accountnum = monitor_infos_.accountnum();
@@ -220,13 +213,12 @@ MidInfo ServerManagerImpl::parseInfos(
         mid_info.gpu_used_mem.push_back(
             monitor_infos_.gpu_info(i).gpu_mem_used());
     }
-    mid_info.printInfo();
+    // mid_info.printInfo();
     return mid_info;
 }
 
 bool ServerManagerImpl::insertOneInfo(
     monitor::proto::MonitorInfo& monitor_infos_) {
-    LOG(INFO) << "Run: ServerManagerImpl::insertOneInfo";
     std::shared_ptr<MysqlConn> conn_ptr = this->pool->getConnection();
     MidInfo mid_info = parseInfos(monitor_infos_);
     std::string table_name = "table_" + mid_info.timeymd;
@@ -253,9 +245,7 @@ bool ServerManagerImpl::insertOneInfo(
         toJsonStr(mid_info.gpu_used_mem), toJsonStr(mid_info.gpu_temperture),
         toJsonStr(mid_info.gpu_mem_utilize));
 
-    LOG(INFO) << "InsertOneInfo SQL: " << sql;
     if (conn_ptr->update(sql)) {
-        LOG(INFO) << "Succeed to insert one sql";
         if (updateMachineStatus(user_id, mid_info.machine_name)) {
             return true;
         }
@@ -264,7 +254,8 @@ bool ServerManagerImpl::insertOneInfo(
     return false;
 }
 
-bool ServerManagerImpl::updateMachineStatus(std::string user_id, std::string machine_name) {
+bool ServerManagerImpl::updateMachineStatus(std::string user_id,
+                                            std::string machine_name) {
     std::shared_ptr<MysqlConn> conn_ptr = this->pool->getConnection();
     std::string sql = fmt::format(
         "UPDATE machine SET last_update_time = (SELECT NOW()) where "
@@ -280,7 +271,6 @@ std::string ServerManagerImpl::selectUserId(std::string accountNum) {
     std::shared_ptr<MysqlConn> conn_ptr = this->pool->getConnection();
     std::string sql = fmt::format(
         "SELECT id FROM `user` u WHERE accountnum ='{}'", accountNum);
-    LOG(INFO) << "selectUserId select SQL: " << sql;
     std::string user_id;
     if (conn_ptr->query(sql) == true) {
         while (conn_ptr->next()) {
@@ -297,7 +287,6 @@ bool ServerManagerImpl::isMachineExist(std::string user_id,
         "SELECT COUNT(*) FROM `machine` m WHERE user_id={} and "
         "machine_name='{}'",
         user_id, machine_name);
-    LOG(INFO) << "isMachineExist select SQL: " << sql;
     int machine_count = 0;
     if (conn_ptr->query(sql) == true) {
         while (conn_ptr->next()) {
@@ -308,7 +297,6 @@ bool ServerManagerImpl::isMachineExist(std::string user_id,
         sql = fmt::format(
             "INSERT INTO machine (user_id,machine_name) values('{}','{}')",
             user_id, machine_name);
-        LOG(INFO) << "isMachineExist insert SQL: " << sql;
         conn_ptr->update(sql);
     }
 }
@@ -340,7 +328,6 @@ void UserManagerImpl::LoginRegister(
     const ::monitor::proto::UserMessage* request,
     ::monitor::proto::UserResponseMessage* response,
     ::google::protobuf::Closure* done) {
-    LOG(INFO) << "RPC Call: UserManagerImpl::LoginRegister";
     account_num_ = request->account_num();
     pwd_ = request->pwd();
     if (account_num_.empty()) {
@@ -402,7 +389,6 @@ void UserManagerImpl::queryUserMachineName(
         "SELECT machine_name FROM `machine` m WHERE user_id =(SELECT id FROM "
         "`user` u WHERE accountnum = '{}')",
         account_num_);
-    LOG(INFO) << "queryUserMachineName: " << sql;
     std::vector<std::string> machine_name_array;
     if (conn_ptr->query(sql) == true) {
         while (conn_ptr->next()) {

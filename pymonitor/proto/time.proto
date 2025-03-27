@@ -1,7 +1,0 @@
-syntax = "proto3";
-package monitor.proto;
-
-message Time {
-    string timeymd = 1;
-    string timehms = 2;
-  }

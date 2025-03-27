@@ -1,6 +1,0 @@
-{
-    "server_address":"localhost:50051",
-    "account_num":"12345678",
-    "machine_name":"xiaoxin_mx350",
-    "fifo_path":"/home/work/bin/utils/py_cpp_pipe.fifo"
-}

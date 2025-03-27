@@ -1,2 +1,0 @@
-python -m grpc_tools.protoc -I. --python_out=../src/pyproto --grpc_python_out=../src/pyproto ./cpu_load.proto ./cpu_softirq.proto ./cpu_stat.proto ./gpu_info.proto ./hard_disk.proto ./login_register.proto ./mem_info.proto ./monitor_info.proto ./net_info.proto ./os.proto ./query.proto ./time.proto
-# python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. rpcheader.proto
