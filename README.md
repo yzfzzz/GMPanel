@@ -2,8 +2,7 @@
 ![logo](./doc/img/logo.jpg)
 ## 🎉项目意义
 
-对于搞深度学习的学生，如果你是使用公共 GPU 服务器集群的话，也许这个项目对你有帮助
-
+对于搞深度学习的学生，如果你是使用公共 GPU 服务器集群的话，也许这个项目对你有帮助<br>
 它可以让你在手机上就查看服务器的显存大小, 无需 ssh 登录服务器, 然后输入 nvidia-smi 命令
 
 
@@ -82,6 +81,10 @@ qt客户端界面<br>
     ```shell
     ./gmpanel_client
     ```
+
+b站演示: 
+ - https://www.bilibili.com/video/BV1LNR8YWEYY
+ - https://www.bilibili.com/video/BV1iqqNYCEv8
 ### 自己搭建服务
 建议使用我提供的云服务器
 
