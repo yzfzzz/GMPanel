@@ -1,6 +1,3 @@
-import site
-new_path = './pyproto'
-site.addsitedir(new_path)
 import sys
 import monitor_info_pb2
 import login_register_pb2
