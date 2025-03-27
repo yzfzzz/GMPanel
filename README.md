@@ -82,7 +82,7 @@ qt客户端界面<br>
     ./gmpanel_client
     ```
 
-**🏝️新用户使用之前需要注册账号**，教程: 
+**🏝️新用户使用之前需要注册账号**，网页端访问地址：http://124.223.141.236/: 
  - https://www.bilibili.com/video/BV1LNR8YWEYY
 
 ### 自己搭建服务
