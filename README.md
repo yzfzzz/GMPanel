@@ -68,6 +68,7 @@ qt客户端界面<br>
 ### 快速使用
 1. 点击[下载文件](https://github.com/yzfzzz/GMPanel/releases/tag/v0.8.1)，解压到服务器任意目录<br>
 ![快速使用1](./doc/img/快速使用1.png)<br>
+2. 新用户需要先注册账号: [注册教程](https://www.bilibili.com/video/BV1LNR8YWEYY)
 2. 修改配置文件config.yaml，修改账号，机器名自定义
     ```yaml
     # 用户账号，新用户先需要注册
@@ -83,7 +84,6 @@ qt客户端界面<br>
     ```
 
 b站演示: 
- - https://www.bilibili.com/video/BV1LNR8YWEYY
  - https://www.bilibili.com/video/BV1iqqNYCEv8
 ### 自己搭建服务
 建议使用我提供的云服务器
