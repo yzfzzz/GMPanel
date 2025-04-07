@@ -1,10 +1,10 @@
 #pragma once
 
+#include <sys/epoll.h>
 #include <functional>
 #include <memory>
 #include "Timestamp.h"
 #include "noncopyable.h"
-#include <sys/epoll.h>
 
 namespace mymuduo {
 class EventLoop;
@@ -20,7 +20,22 @@ class Channel : noncopyable {
 
     void handleEventWithGuard(Timestamp& receiveTime);
 
-    private:
+    void set_revents(int revt) { revents_ = revt; }
+
+    // 设置fd相应的事件状态
+    void disableWriting() {
+        events_ &= ~kWriteEvent;
+        update(); 
+    }
+
+    // fd当前正在写, 用在 TcpConnection::handleWrite() 中
+    bool isWriting const() { return events_ & kWriteEvent; }
+    bool isNoneEvent() const { return events_ == kNoneEvent; }
+    void set_index(int idx) { index_ = idx; }
+
+   private:
+    void update();
+
     // 事件循环
     EventLoop* loop_;
     // 管理的 fd 文件描述符
@@ -38,5 +53,10 @@ class Channel : noncopyable {
     EventCallback writeCallback_;
     EventCallback closeCallback_;
     EventCallback errorCallback_;
+
+    // fd状态标志位
+    static const int kNoneEvent;
+    static const int kReadEvent;
+    static const int kWriteEvent;
 };
 };  // namespace mymuduo
