@@ -1,5 +1,4 @@
 #include "mprpcapplication.h"
-#include "mprpclog.h"
 #include "rpcheader.pb.h"
 #include "rpcprovider.h"
 #include "zookeeperutil.h"
