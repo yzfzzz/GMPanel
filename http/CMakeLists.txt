@@ -2,7 +2,7 @@ find_package(fmt REQUIRED)
 find_package(yaml-cpp REQUIRED)
 set(SOURCES
    http_server.cpp
-   ../utils/query_data.cpp
+   ../utils/service.cpp
 )
 
 find_package(Boost REQUIRED COMPONENTS system chrono date_time)
