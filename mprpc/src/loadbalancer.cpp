@@ -12,8 +12,12 @@ std::string LoadBalancer::operator()(std::vector<std::string> host_array) {
 
 std::string LoadBalancer::roundRobinBalance(
     std::vector<std::string> host_array) {
-    static int index = 0;
-    return host_array[index++ % host_array.size()];
+    round_robin_index++; 
+    if(round_robin_index >= host_array.size())
+    {
+        round_robin_index = 0;
+    }
+    return host_array[round_robin_index];
 }
 
 std::string LoadBalancer::randomBalance(std::vector<std::string> host_array) {

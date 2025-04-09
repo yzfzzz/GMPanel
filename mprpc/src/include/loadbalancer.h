@@ -17,7 +17,7 @@ enum LoadPattern {
 class LoadBalancer {
    public:
     LoadBalancer(int load_pattern = ROUND_ROBIN)
-        : load_pattern_(load_pattern) {}
+        : load_pattern_(load_pattern),round_robin_index(0) {}
 
     std::string operator()(std::vector<std::string> host_array);
 
@@ -27,4 +27,5 @@ class LoadBalancer {
     std::string hashBalance(std::vector<std::string> host_array);
     std::unordered_map<std::string, std::string> queryHostIP();
     int load_pattern_;
+    int round_robin_index;
 };

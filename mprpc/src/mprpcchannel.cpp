@@ -9,7 +9,6 @@
 #include "mprpcapplication.h"
 #include "mprpcchannel.h"
 #include "rpcheader.pb.h"
-#include "zookeeperutil.h"
 
 // 数据格式: header_size + service_name method_name args_size + args
 void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
@@ -57,14 +56,6 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     send_rpc_str += rpc_header_str;
     send_rpc_str += args_str;
 
-    // 打印调试信息
-    std::cout << "=========================" << std::endl;
-    std::cout << "header_size: " << header_size << std::endl;
-    std::cout << "rpc_header_str: " << rpc_header_str << std::endl;
-    std::cout << "service_name: " << service_name << std::endl;
-    std::cout << "method_name: " << method_name << std::endl;
-    std::cout << "args_str: " << args_str << std::endl;
-    std::cout << "send_rpc_str.size: " << send_rpc_str.size() << std::endl;
     // 使用tcp编程
     int clientfd = socket(AF_INET, SOCK_STREAM, 0);
     if (clientfd == -1) {
@@ -77,22 +68,22 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     }
 
     // TODO: 健康检测，负载均衡
-    ZkClient zkCli;
-    zkCli.Start();
     // /UserServiceRpc/Login
     std::string method_path = "/" + service_name + "/" + method_name;
     // 127.0.0.1:8000
-    std::vector<std::string> host_array =
-        zkCli.GetChildren(method_path.c_str());
+    if (method_host_map.find(method_path) == method_host_map.end() || zkCli.isChildNodeChanges()) {
+        method_host_map[method_path] = zkCli.GetChildren(method_path.c_str());
+    }
+    std::vector<std::string> host_array;
+    host_array = method_host_map[method_path];
 
     // 负载均衡
     std::string host_data;
-    if(host_array.size() == 0)
-    {
+    if (host_array.size() == 0) {
         controller->SetFailed(method_path + " address is invalid!");
         return;
     }
-    host_data = (*p_load_balancer)(host_array);
+    host_data = load_balancer(host_array);
     std::cout << "HOST DATA: " << host_data << std::endl;
     // std::string host_data = host_array[0];
     if (host_data == "") {
@@ -105,11 +96,6 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         return;
     }
     std::string ip = host_data.substr(0, idx);
-
-    // TODO： NAT_mode
-    if (MprpcApplication::GetInstance().GetConfig().Load("NAT_mode") == "yes") {
-        ip = MprpcApplication::GetInstance().GetConfig().Load("rpcserverip");
-    }
 
     uint16_t port =
         atoi(host_data.substr(idx + 1, host_data.size() - idx).c_str());

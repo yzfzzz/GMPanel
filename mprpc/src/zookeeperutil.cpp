@@ -3,7 +3,7 @@
 #include "mprpcapplication.h"
 #include "zookeeperutil.h"
 
-ZkClient::ZkClient() : m_zhandle(nullptr) {}
+ZkClient::ZkClient() : m_zhandle(nullptr), child_change_flag(true) {}
 
 ZkClient::~ZkClient() {
     if (m_zhandle != nullptr) {
@@ -21,12 +21,15 @@ void global_watcher(zhandle_t* zh, int type, int state, const char* path,
         if (state == ZOO_CONNECTED_STATE) {
             // !这里执行完zoo_get_context函数，sem可能是一个空指针
             sem_t* sem = nullptr;
-            while(sem == nullptr)
-            {
+            while (sem == nullptr) {
                 sem = (sem_t*)zoo_get_context(zh);
             }
             sem_post(sem);
         }
+    } else if (type == ZOO_CHILD_EVENT) {
+        std::cout << "get child event" << std::endl;
+        ZkClient* zkCli = static_cast<ZkClient*>(watcherCtx);
+        zkCli->setChildNodeChanges(true);
     }
 }
 
@@ -95,16 +98,15 @@ std::string ZkClient::GetData(const char* path) {
 
 std::vector<std::string> ZkClient::GetChildren(const char* path) {
     String_vector children;
-    int flag = zoo_get_children(m_zhandle, path, 0, &children);
-    if(flag != ZOK)
-    {
+    int flag = zoo_wget_children(m_zhandle, path, global_watcher, this, &children);
+    if (flag != ZOK) {
         std::cout << "get children error... path:" << path << std::endl;
         return std::vector<std::string>();
     }
     std::vector<std::string> v;
-    for(int i = 0; i < children.count; ++i)
-    {
+    for (int i = 0; i < children.count; ++i) {
         v.push_back(children.data[i]);
     }
+    child_change_flag = false;
     return v;
 }

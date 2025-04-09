@@ -4,14 +4,16 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/service.h>
 #include <memory>
+#include <unordered_map>
 #include "loadbalancer.h"
+#include "zookeeperutil.h"
 
 class MprpcChannel : public google::protobuf::RpcChannel {
    public:
     // 所有通过stub代理对象调用的rpc方法, 都走到了这里,
     // 统一做rpc方法调用数据的数据序列化和网络发送
-    MprpcChannel(int load_pattern = 0) {
-        p_load_balancer = std::make_unique<LoadBalancer>(load_pattern);
+    MprpcChannel(int load_pattern = 0) : zkCli(), load_balancer(load_pattern) {
+        zkCli.Start();
     }
     // ~MprpcChannel() { delete load_balancer_; }
     void CallMethod(const google::protobuf::MethodDescriptor* method,
@@ -21,5 +23,7 @@ class MprpcChannel : public google::protobuf::RpcChannel {
                     google::protobuf::Closure* done);
 
    private:
-    std::unique_ptr<LoadBalancer> p_load_balancer;
+    LoadBalancer load_balancer;
+    ZkClient zkCli;
+    std::unordered_map<std::string, std::vector<std::string>> method_host_map;
 };
