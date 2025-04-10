@@ -46,7 +46,7 @@ void ZkClient::Start() {
     网络I/O线程 pthread_create poll
     watcher回调线程
     */
-    m_zhandle = zookeeper_init(connstr.c_str(), global_watcher, 30000, nullptr,
+    m_zhandle = zookeeper_init(connstr.c_str(), global_watcher, 300000, nullptr,
                                nullptr, 0);
     if (m_zhandle == nullptr) {
         std::cout << "zookeeper_init error!" << std::endl;
@@ -98,7 +98,8 @@ std::string ZkClient::GetData(const char* path) {
 
 std::vector<std::string> ZkClient::GetChildren(const char* path) {
     String_vector children;
-    int flag = zoo_wget_children(m_zhandle, path, global_watcher, this, &children);
+    int flag =
+        zoo_wget_children(m_zhandle, path, global_watcher, this, &children);
     if (flag != ZOK) {
         std::cout << "get children error... path:" << path << std::endl;
         return std::vector<std::string>();

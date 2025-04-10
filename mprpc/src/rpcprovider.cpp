@@ -114,6 +114,7 @@ void RpcProvider::OnMessage(const muduo::net::TcpConnectionPtr& conn,
                             muduo::net::Buffer* buffer, muduo::Timestamp) {
     if(!m_tokenBucket.consume(1))
     {
+        std::cout << "tokenBucket consume all token!"<< std::endl;
         return;
     }
     
