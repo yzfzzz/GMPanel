@@ -23,6 +23,7 @@ class Channel : noncopyable {
     void set_revents(int revt) { revents_ = revt; }
 
     // 设置fd相应的事件状态
+    void enableReading() { events_ |= kReadEvent; update(); }
     void disableWriting() {
         events_ &= ~kWriteEvent;
         update(); 
@@ -32,6 +33,7 @@ class Channel : noncopyable {
     bool isWriting const() { return events_ & kWriteEvent; }
     bool isNoneEvent() const { return events_ == kNoneEvent; }
     void set_index(int idx) { index_ = idx; }
+    void tie(const std::shared_ptr<void>&);
 
    private:
     void update();

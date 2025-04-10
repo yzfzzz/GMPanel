@@ -58,4 +58,18 @@ void Channel::update() {
     // 通过channel所属的EventLoop，调用poller的相应方法，注册fd的events事件
     loop_->updateChannel(this);
 }
+
+// 在channel所属的EventLoop中，把当前的channel删除掉
+// 实际上是从epoll中删除:
+void Channel::remove() {
+    loop_->removeChannel(this);
+}
+
+
+// channel的tie方法什么时候调用过？一个TcpConnection新连接创建的时候 TcpConnection => Channel 
+// 防止当channel被手动remove掉，channel还在执行回调操作
+void Channel::tie(const std::shared_ptr<void>& obj) {
+    tie_ = obj;
+    tied_ = true;
+}
 };  // namespace mymuduo

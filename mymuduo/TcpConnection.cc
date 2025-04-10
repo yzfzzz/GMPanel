@@ -75,14 +75,43 @@ void TcpConnection::handleWrite() {
                 // -> EPollPoller.update
                 // -> epoll_ctl
                 channel_->disableWriting();
-                if(writeCompleteCallback_)
-                {
+                if (writeCompleteCallback_) {
                     // 唤醒loop对应的thread线程, 执行回调
-                    loop_->queue
+                    // shared_from_this() 返回share_ptr管理的this指针
+                    loop_->queueInLoop(
+                        std::bind(writeCompleteCallback_, shared_from_this()));
+                }
+                if (state_ == kDisconnecting) {
+                    shutdownInLoop();
                 }
             }
+        } else {
         }
+    } else {
     }
+}
+
+// 连接建立
+void TcpConnection::connectEstablished() {
+    setState(kConnected);
+    channel_->tie(shared_from_this());
+    // 向epoll注册channel的epollin事件
+    channel_->enableReading();
+    // 新连接建立，执行回调
+    connectionCallback_(shared_from_this());
+}
+
+// 连接销毁
+void TcpConnection::connectDestroyed(){
+    if(state_ == kConnected){
+        setState(kDisconnected);
+        // 把channel所有感兴趣的事件，都从epoll中del
+        channel_->disableAll();
+        // TODO:为什么要这条函数
+        connectionCallback_(shared_from_this());
+    }
+    // Channel::remove()->EventLoop::removeChannel->EPollPoller::removeChannel->epoll_ctl
+    channel_->remove();
 }
 
 };  // namespace mymuduo

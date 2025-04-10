@@ -85,4 +85,16 @@ void EPollPoller::update(int operation, Channel* channel) {
     }
 }
 
+// 从poller中删除channel
+void EPollPoller::removeChannel(Channel* channel) {
+    int fd = channel->fd();
+    channels_.erase(fd);
+
+    int index = channel->index();
+    if (index == kAdded) {
+        update(EPOLL_CTL_DEL, channel);
+        channel->set_index(kDeleted);
+    }
+}
+
 };  // namespace mymuduo
