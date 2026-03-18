@@ -115,4 +115,4 @@ cd bin
 ## Join Us
 由于这个项目仍不够完善，如果你有更好的想法，欢迎提issue，一起交流。
 
-b站: https://space.bilibili.com/517357927
+项目演示链接（b站）: https://www.bilibili.com/video/BV1iqqNYCEv8
