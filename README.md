@@ -1,5 +1,10 @@
 # GMPanel：GPU服务器管理面板
 ![logo](./doc/img/logo.jpg)
+
+项目演示链接（b站）: 
+- QT版：https://www.bilibili.com/video/BV1iqqNYCEv8
+- 网页版：https://www.bilibili.com/video/BV1LNR8YWEYY
+
 ## 🎉项目意义
 
 对于搞深度学习的学生，如果你是使用公共 GPU 服务器集群的话，也许这个项目对你有帮助<br>
@@ -114,5 +119,3 @@ cd bin
 ```
 ## Join Us
 由于这个项目仍不够完善，如果你有更好的想法，欢迎提issue，一起交流。
-
-项目演示链接（b站）: https://www.bilibili.com/video/BV1iqqNYCEv8
