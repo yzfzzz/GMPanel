@@ -1,0 +1,3 @@
+[submodule "yrpc"]
+	path = yrpc
+	url = https://github.com/yzfzzz/yrpc.git
