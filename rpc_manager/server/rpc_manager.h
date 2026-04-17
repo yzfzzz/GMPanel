@@ -13,7 +13,7 @@
 #include "log.h"
 #include "midinfo.h"
 
-#if RPC_TYPE_DEFINE == MPRPC
+#if RPC_TYPE_DEFINE == YRPC
 #include "mprpcapplication.h"
 #include "rpcprovider.h"
 #elif RPC_TYPE_DEFINE == GRPC
@@ -24,7 +24,7 @@
 #include "monitor_info.pb.h"
 #include "mysql_conn.h"
 namespace monitor {
-#if RPC_TYPE_DEFINE == MPRPC
+#if RPC_TYPE_DEFINE == YRPC
 class ServerManagerImpl : public monitor::proto::MonitorManager
 #elif RPC_TYPE_DEFINE == GRPC
 class ServerManagerImpl : public monitor::proto::MonitorManager::Service
@@ -34,7 +34,7 @@ class ServerManagerImpl : public monitor::proto::MonitorManager::Service
     ServerManagerImpl();
     virtual ~ServerManagerImpl();
 
-#if RPC_TYPE_DEFINE == MPRPC
+#if RPC_TYPE_DEFINE == YRPC
     void SetMonitorInfo(::google::protobuf::RpcController* controller,
                         const ::monitor::proto::MonitorInfo* request,
                         ::google::protobuf::Empty* response,
@@ -91,7 +91,7 @@ class ServerManagerImpl : public monitor::proto::MonitorManager::Service
     ConnectionPool* pool = ConnectionPool::getConnectPool();
 };
 
-#if RPC_TYPE_DEFINE == MPRPC
+#if RPC_TYPE_DEFINE == YRPC
 class UserManagerImpl : public monitor::proto::UserManager
 #elif RPC_TYPE_DEFINE == GRPC
 class UserManagerImpl : public monitor::proto::UserManager::Service
@@ -101,7 +101,7 @@ class UserManagerImpl : public monitor::proto::UserManager::Service
     UserManagerImpl();
     virtual ~UserManagerImpl();
 
-#if RPC_TYPE_DEFINE == MPRPC
+#if RPC_TYPE_DEFINE == YRPC
     void LoginRegister(::google::protobuf::RpcController* controller,
                        const ::monitor::proto::UserMessage* request,
                        ::monitor::proto::UserResponseMessage* response,

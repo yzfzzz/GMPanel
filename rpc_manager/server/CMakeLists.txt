@@ -26,9 +26,9 @@ include_directories(
 )
 
 # 根据条件添加包含目录
-if(RPC_TYPE STREQUAL "mprpc")
-    link_directories(${PROJECT_SOURCE_DIR}/mprpc/lib)
-    include_directories(${PROJECT_SOURCE_DIR}/mprpc/src/include)
+if(RPC_TYPE STREQUAL "yrpc")
+    link_directories(${PROJECT_SOURCE_DIR}/yrpc/lib)
+    include_directories(${PROJECT_SOURCE_DIR}/yrpc/src/include)
 endif()
 
 # 创建可执行文件
@@ -44,6 +44,6 @@ target_link_libraries(server
     glog
 )
 # 根据条件链接库
-if(RPC_TYPE STREQUAL "mprpc")
-    target_link_libraries(server PUBLIC mprpc)
+if(RPC_TYPE STREQUAL "yrpc")
+    target_link_libraries(server PUBLIC yrpc)
 endif()

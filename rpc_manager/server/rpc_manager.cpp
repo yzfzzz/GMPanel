@@ -1,8 +1,8 @@
+#include "rpc_manager.h"
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <iostream>
 #include "get_time.h"
-#include "rpc_manager.h"
 namespace monitor {
 
 enum SystemMetrics {
@@ -36,7 +36,7 @@ ServerManagerImpl::~ServerManagerImpl() {}
 UserManagerImpl ::UserManagerImpl() {}
 UserManagerImpl ::~UserManagerImpl() {}
 
-#if RPC_TYPE_DEFINE == MPRPC
+#if RPC_TYPE_DEFINE == YRPC
 void ServerManagerImpl::SetMonitorInfo(
     ::google::protobuf::RpcController* controller,
     const ::monitor::proto::MonitorInfo* request,
@@ -60,7 +60,7 @@ void ServerManagerImpl::SetMonitorInfo(
 }
 
 #endif
-#if RPC_TYPE_DEFINE == MPRPC
+#if RPC_TYPE_DEFINE == YRPC
 void ServerManagerImpl::GetMonitorInfo(
     ::google::protobuf::RpcController* controller,
     const ::monitor::proto::QueryMessage* request,
@@ -322,7 +322,7 @@ bool ServerManagerImpl::isTableExist(std::string table_name,
     }
     return false;
 }
-#if RPC_TYPE_DEFINE == MPRPC
+#if RPC_TYPE_DEFINE == YRPC
 void UserManagerImpl::LoginRegister(
     ::google::protobuf::RpcController* controller,
     const ::monitor::proto::UserMessage* request,

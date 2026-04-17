@@ -8,7 +8,7 @@
 #include "login_register.pb.h"
 #include "monitor_info.pb.h"
 
-#if RPC_TYPE_DEFINE == MPRPC
+#if RPC_TYPE_DEFINE == YRPC
 #include "mprpcapplication.h"
 #elif RPC_TYPE_DEFINE == GRPC
 #include <grpc/grpc.h>
@@ -34,7 +34,7 @@ class RpcClient {
 
    public:
 // 每个service对应着一个指针
-#if RPC_TYPE_DEFINE == MPRPC
+#if RPC_TYPE_DEFINE == YRPC
     std::unique_ptr<monitor::proto::MonitorManager_Stub> stub_ptr_;
     std::unique_ptr<monitor::proto::UserManager_Stub> user_stub_ptr_;
 #elif RPC_TYPE_DEFINE == GRPC

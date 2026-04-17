@@ -6,9 +6,9 @@ link_directories(${PROJECT_SOURCE_DIR}/build/proto)
 include_directories(${PROJECT_SOURCE_DIR}/build/proto 
     ${PROJECT_SOURCE_DIR}/utils)
 
-if(RPC_TYPE STREQUAL "mprpc")
-    link_directories(${PROJECT_SOURCE_DIR}/mprpc/lib)
-    include_directories(${PROJECT_SOURCE_DIR}/mprpc/src/include)
+if(RPC_TYPE STREQUAL "yrpc")
+    link_directories(${PROJECT_SOURCE_DIR}/yrpc/lib)
+    include_directories(${PROJECT_SOURCE_DIR}/yrpc/src/include)
 endif()
 
 add_library(client ${SOURCES})

@@ -19,7 +19,7 @@ void InitServer() {
 }
 #endif
 
-#if RPC_TYPE_DEFINE == MPRPC
+#if RPC_TYPE_DEFINE == YRPC
 int main() {
     std::string log_path = "./logs";
     monitor::SetupLogging(log_path);

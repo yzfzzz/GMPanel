@@ -21,9 +21,9 @@ target_include_directories(http_server PUBLIC
   ${PROJECT_SOURCE_DIR}/utils
 )
 
-if(RPC_TYPE STREQUAL "mprpc")
-    link_directories(${PROJECT_SOURCE_DIR}/mprpc/lib)
-    include_directories(${PROJECT_SOURCE_DIR}/mprpc/src/include)
+if(RPC_TYPE STREQUAL "yrpc")
+    link_directories(${PROJECT_SOURCE_DIR}/yrpc/lib)
+    include_directories(${PROJECT_SOURCE_DIR}/yrpc/src/include)
 endif()
 
 
@@ -41,6 +41,6 @@ target_link_libraries(http_server
     yaml-cpp
 )
 
-if(RPC_TYPE STREQUAL "mprpc")
-    target_link_libraries(http_server PUBLIC mprpc)
+if(RPC_TYPE STREQUAL "yrpc")
+    target_link_libraries(http_server PUBLIC yrpc)
 endif()
