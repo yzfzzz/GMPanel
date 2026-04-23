@@ -3,4 +3,3 @@
 	url = https://github.com/yzfzzz/yrpc.git
 [submodule "panel_monitor"]
 	path = panel_monitor
-	url = https://github.com/yzfzzz/PanelMonitor.git
